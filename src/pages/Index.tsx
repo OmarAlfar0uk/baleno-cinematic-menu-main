@@ -9,6 +9,7 @@ import { useStore } from "@/store/useStore";
 import { AnimatePresence, motion } from "framer-motion";
 
 const INTRO_SEEN_KEY = "baleno-intro-seen";
+const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard"));
 const FeaturedSection = lazy(() => import("@/components/FeaturedSection"));
 const AboutStrip = lazy(() => import("@/components/AboutStrip"));
 const Footer = lazy(() => import("@/components/Footer"));
@@ -18,6 +19,7 @@ const Index = () => {
   const { categories, items } = useStore();
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id || "");
   const [cartOpen, setCartOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const [introDone, setIntroDone] = useState(() => {
     try {
       return localStorage.getItem(INTRO_SEEN_KEY) === "1";
@@ -105,9 +107,23 @@ const Index = () => {
         <FloatingCart onClick={() => setCartOpen(true)} />
         <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
         <Suspense fallback={null}>
-          <AdminGate />
+          <AdminGate onAuthenticated={() => setAdminOpen(true)} />
         </Suspense>
       </motion.div>
+
+      <AnimatePresence>
+        {adminOpen && (
+          <Suspense
+            fallback={
+              <div className="fixed inset-0 z-[100] grid place-items-center bg-background/70 backdrop-blur-sm">
+                <p className="font-heading text-gold">Loading dashboard...</p>
+              </div>
+            }
+          >
+            <AdminDashboard onClose={() => setAdminOpen(false)} />
+          </Suspense>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

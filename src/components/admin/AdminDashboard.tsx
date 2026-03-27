@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/store/useStore";
-import { X, ClipboardList, FolderOpen, ShoppingCart, Settings, LogOut, Menu, BarChart3 } from "lucide-react";
+import { X, ClipboardList, FolderOpen, ShoppingCart, Settings, LogOut, Menu, BarChart3, CloudUpload, Link2, Unplug } from "lucide-react";
 import balenoLogo from "@/assets/baleno-logo.png";
 import AdminMenuItems from "./AdminMenuItems";
 import AdminCategories from "./AdminCategories";
@@ -8,6 +8,15 @@ import AdminOrders from "./AdminOrders";
 import AdminSettings from "./AdminSettings";
 import AdminReports from "./AdminReports";
 import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import {
+  getPublishingUserEmail,
+  initPublishingIdentity,
+  logoutPublishingUser,
+  openPublishingLogin,
+  publishSiteDraft,
+} from "@/lib/netlifyPublishing";
 
 interface AdminDashboardProps {
   onClose: () => void;
@@ -27,16 +36,72 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
   const [activeTab, setActiveTab] = useState<Tab>("items");
   const [clock, setClock] = useState(new Date());
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const { items, categories, orders } = useStore();
+  const [publishingEmail, setPublishingEmail] = useState<string | null>(getPublishingUserEmail());
+  const [isPublishing, setIsPublishing] = useState(false);
+  const { items, categories, orders, updateItem } = useStore();
 
   useEffect(() => {
     const t = setInterval(() => setClock(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    initPublishingIdentity(setPublishingEmail);
+  }, []);
+
   const todayOrders = orders.filter(
     (o) => new Date(o.timestamp).toDateString() === new Date().toDateString()
   ).length;
+
+  const handleConnectPublishing = () => {
+    try {
+      openPublishingLogin();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Publishing login is unavailable.");
+    }
+  };
+
+  const handleDisconnectPublishing = async () => {
+    try {
+      await logoutPublishingUser();
+      setPublishingEmail(null);
+      toast.success("Publishing account disconnected");
+    } catch {
+      toast.error("Could not disconnect publishing account");
+    }
+  };
+
+  const handlePublishLive = async () => {
+    if (!publishingEmail) {
+      handleConnectPublishing();
+      toast.error("Connect your publishing account first.");
+      return;
+    }
+
+    setIsPublishing(true);
+
+    try {
+      const snapshot = useStore.getState();
+      const publishedDraft = await publishSiteDraft({
+        settings: snapshot.settings,
+        branches: snapshot.branches,
+        currentBranchId: snapshot.currentBranchId,
+        categories: snapshot.categories,
+        items: snapshot.items,
+      });
+
+      publishedDraft.items.forEach((item) => {
+        updateItem(item.id, { image: item.image || "" });
+      });
+
+      toast.success("Changes published. Netlify will deploy the update now.");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Publishing failed.";
+      toast.error(message);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
 
   return (
     <motion.div
@@ -116,6 +181,15 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
             <h1 className="font-heading text-base lg:text-lg text-foreground truncate">Baleno Admin Panel</h1>
           </div>
           <div className="flex items-center gap-3 lg:gap-4">
+            <Button
+              type="button"
+              onClick={handlePublishLive}
+              disabled={isPublishing}
+              className="hidden md:inline-flex bg-[#22c55e] hover:bg-[#16a34a] text-white"
+            >
+              <CloudUpload size={15} />
+              {isPublishing ? "Publishing..." : "Publish Live"}
+            </Button>
             <span className="hidden sm:inline text-muted-foreground text-xs lg:text-sm font-mono">
               {clock.toLocaleDateString("en-EG", { weekday: "short", month: "short", day: "numeric" })}{" "}
               {clock.toLocaleTimeString("en-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
@@ -125,6 +199,39 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
             </button>
           </div>
         </header>
+
+        <div className="px-4 lg:px-6 pt-4 shrink-0">
+          <div className="rounded-xl border border-border bg-card px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                {publishingEmail ? `Publishing connected: ${publishingEmail}` : "Publishing account not connected"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Keep using your classic dashboard. When you finish editing, press <span className="font-semibold text-foreground">Publish Live</span> to send the latest menu and images to everyone.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              {publishingEmail ? (
+                <Button type="button" variant="outline" onClick={handleDisconnectPublishing} className="gap-2">
+                  <Unplug size={14} /> Disconnect
+                </Button>
+              ) : (
+                <Button type="button" variant="outline" onClick={handleConnectPublishing} className="gap-2">
+                  <Link2 size={14} /> Connect Publishing
+                </Button>
+              )}
+              <Button
+                type="button"
+                onClick={handlePublishLive}
+                disabled={isPublishing}
+                className="md:hidden bg-[#22c55e] hover:bg-[#16a34a] text-white gap-2"
+              >
+                <CloudUpload size={15} />
+                {isPublishing ? "Publishing..." : "Publish Live"}
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 p-4 lg:p-6 shrink-0">

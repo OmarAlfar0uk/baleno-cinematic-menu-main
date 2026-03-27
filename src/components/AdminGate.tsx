@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
-const AdminGate = () => {
+interface AdminGateProps {
+  onAuthenticated: () => void;
+}
+
+const AdminGate = ({ onAuthenticated }: AdminGateProps) => {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -16,7 +20,7 @@ const AdminGate = () => {
       setOpen(false);
       setPassword("");
       setError(false);
-      window.location.assign("/admin/");
+      onAuthenticated();
     } else {
       setError(true);
       setTimeout(() => setError(false), 600);
@@ -39,7 +43,7 @@ const AdminGate = () => {
           <DialogHeader>
             <DialogTitle className="font-heading text-gold gold-glow">Content Admin</DialogTitle>
             <DialogDescription className="text-muted-foreground text-sm">
-              Enter the password to open the publishing dashboard for menu items and images.
+              Enter the password to open your classic admin dashboard, then publish changes live when you are ready.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -55,7 +59,7 @@ const AdminGate = () => {
               {error && <p className="text-destructive text-xs mt-1">Wrong password</p>}
             </motion.div>
             <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80">
-              Open Publishing Dashboard
+              Open Dashboard
             </Button>
           </form>
         </DialogContent>
