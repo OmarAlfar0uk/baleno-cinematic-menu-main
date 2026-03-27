@@ -23,6 +23,23 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap"
     />
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    <script>
+      (function () {
+        var locationData = window.location;
+        var currentPath = locationData.pathname || "/";
+        var currentSearch = locationData.search || "";
+        var currentHash = locationData.hash || "";
+        var tokenKeys = ["invite_token", "confirmation_token", "recovery_token"];
+        var hasIdentityToken = tokenKeys.some(function (key) {
+          return currentSearch.indexOf(key + "=") >= 0 || currentHash.indexOf(key + "=") >= 0;
+        });
+
+        if (hasIdentityToken && currentPath !== "/admin/" && currentPath !== "/admin") {
+          window.location.replace("/admin/" + currentSearch + currentHash);
+        }
+      })();
+    </script>
   </head>
 
   <body>
