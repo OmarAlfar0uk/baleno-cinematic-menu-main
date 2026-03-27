@@ -55,12 +55,8 @@ export function initPublishingIdentity(listener?: (email: string | null) => void
 }
 
 export function openPublishingLogin() {
-  const identity = getIdentity();
-  if (!identity) {
-    throw new Error("Netlify Identity is not available on this page.");
-  }
-
-  identity.open("login");
+  const returnTo = `${window.location.origin}${window.location.pathname}?publishing_connected=1`;
+  window.location.assign(`/admin/?connect=1&return_to=${encodeURIComponent(returnTo)}`);
 }
 
 export async function logoutPublishingUser() {

@@ -19,7 +19,13 @@ const Index = () => {
   const { categories, items } = useStore();
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id || "");
   const [cartOpen, setCartOpen] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(() => {
+    try {
+      return new URLSearchParams(window.location.search).get("publishing_connected") === "1";
+    } catch {
+      return false;
+    }
+  });
   const [introDone, setIntroDone] = useState(() => {
     try {
       return localStorage.getItem(INTRO_SEEN_KEY) === "1";
@@ -46,6 +52,18 @@ const Index = () => {
     const stillExists = categories.some((category) => category.id === activeCategory);
     if (!stillExists) setActiveCategory(categories[0].id);
   }, [categories, activeCategory]);
+
+  useEffect(() => {
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get("publishing_connected") === "1") {
+        url.searchParams.delete("publishing_connected");
+        window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+      }
+    } catch {
+      // Ignore query cleanup failures.
+    }
+  }, []);
 
   const handleCategoryChange = (id: string) => {
     setActiveCategory(id);
