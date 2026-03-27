@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -324,5 +322,23 @@
 @keyframes scroll-bounce {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  .animate-float,
+  .animate-pulse-glow,
+  .animate-gradient-shift,
+  .shimmer,
+  .steam::before,
+  .card-3d,
+  .card-3d:hover {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }
 

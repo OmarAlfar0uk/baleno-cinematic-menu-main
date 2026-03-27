@@ -1,0 +1,211 @@
+{
+  "settings": {
+    "restaurantName": "Baleno",
+    "whatsappNumber": "201226801925",
+    "heroTagline": "Est. 2005 - Where Energy Meets Flavor",
+    "currency": "EGP",
+    "openingHours": "8:00 AM - 12:00 AM"
+  },
+  "branches": [
+    {
+      "id": "main-branch",
+      "name": "Baleno Main Branch",
+      "whatsappNumber": "201226801925",
+      "isActive": true
+    }
+  ],
+  "currentBranchId": "main-branch",
+  "categories": [
+    { "id": "hot-drinks", "label": "Hot Drinks", "labelAr": "مشروبات ساخنة", "icon": "☕" },
+    { "id": "cold-drinks", "label": "Cold Drinks", "labelAr": "مشروبات باردة", "icon": "🧊" },
+    { "id": "fresh-juices", "label": "Fresh Juices", "labelAr": "عصائر فريش", "icon": "🥤" },
+    { "id": "desserts", "label": "Desserts", "labelAr": "حلويات", "icon": "🍰" },
+    { "id": "sandwiches", "label": "Sandwiches", "labelAr": "ساندوتشات", "icon": "🥪" },
+    { "id": "breakfast", "label": "Breakfast", "labelAr": "فطار", "icon": "🍳" }
+  ],
+  "items": [
+    {
+      "id": "hot-drinks-espresso",
+      "name": "Espresso",
+      "nameAr": "إسبريسو",
+      "description": "Rich & Bold",
+      "price": 30,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "hot-drinks"
+    },
+    {
+      "id": "hot-drinks-cappuccino",
+      "name": "Cappuccino",
+      "nameAr": "كابتشينو",
+      "description": "Creamy Foam",
+      "price": 45,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "hot-drinks"
+    },
+    {
+      "id": "hot-drinks-turkish-coffee",
+      "name": "Turkish Coffee",
+      "nameAr": "قهوة تركي",
+      "description": "Traditional",
+      "price": 35,
+      "available": true,
+      "categoryId": "hot-drinks"
+    },
+    {
+      "id": "hot-drinks-hot-chocolate",
+      "name": "Hot Chocolate",
+      "nameAr": "شوكولاتة ساخنة",
+      "description": "Velvety",
+      "price": 50,
+      "available": true,
+      "categoryId": "hot-drinks"
+    },
+    {
+      "id": "cold-drinks-iced-latte",
+      "name": "Iced Latte",
+      "nameAr": "لاتيه بارد",
+      "description": "Chilled Perfection",
+      "price": 55,
+      "available": true,
+      "categoryId": "cold-drinks"
+    },
+    {
+      "id": "cold-drinks-frappuccino",
+      "name": "Frappuccino",
+      "nameAr": "فرابتشينو",
+      "description": "Blended Magic",
+      "price": 60,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "cold-drinks"
+    },
+    {
+      "id": "cold-drinks-iced-matcha",
+      "name": "Iced Matcha",
+      "nameAr": "ماتشا بارد",
+      "description": "Japanese Vibes",
+      "price": 65,
+      "available": true,
+      "categoryId": "cold-drinks"
+    },
+    {
+      "id": "cold-drinks-cold-brew",
+      "name": "Cold Brew",
+      "nameAr": "كولد برو",
+      "description": "Slow Steeped",
+      "price": 60,
+      "available": true,
+      "categoryId": "cold-drinks"
+    },
+    {
+      "id": "fresh-juices-mango",
+      "name": "Mango",
+      "nameAr": "مانجو",
+      "price": 40,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "fresh-juices"
+    },
+    {
+      "id": "fresh-juices-orange",
+      "name": "Orange",
+      "nameAr": "برتقال",
+      "price": 35,
+      "available": true,
+      "categoryId": "fresh-juices"
+    },
+    {
+      "id": "fresh-juices-mixed-berry",
+      "name": "Mixed Berry",
+      "nameAr": "فراولة مكس",
+      "price": 50,
+      "available": true,
+      "categoryId": "fresh-juices"
+    },
+    {
+      "id": "desserts-tiramisu",
+      "name": "Tiramisu",
+      "nameAr": "تيراميسو",
+      "description": "Italian Classic",
+      "price": 70,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "desserts"
+    },
+    {
+      "id": "desserts-cheesecake",
+      "name": "Cheesecake",
+      "nameAr": "تشيزكيك",
+      "description": "NY Style",
+      "price": 65,
+      "available": true,
+      "categoryId": "desserts"
+    },
+    {
+      "id": "desserts-brownie",
+      "name": "Brownie",
+      "nameAr": "براوني",
+      "description": "Warm & Gooey",
+      "price": 55,
+      "available": true,
+      "categoryId": "desserts"
+    },
+    {
+      "id": "sandwiches-club-sandwich",
+      "name": "Club Sandwich",
+      "nameAr": "كلاب ساندوتش",
+      "description": "Triple Deck",
+      "price": 85,
+      "available": true,
+      "categoryId": "sandwiches"
+    },
+    {
+      "id": "sandwiches-grilled-chicken",
+      "name": "Grilled Chicken",
+      "nameAr": "دجاج مشوي",
+      "description": "Smoky Flavor",
+      "price": 90,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "sandwiches"
+    },
+    {
+      "id": "sandwiches-tuna-melt",
+      "name": "Tuna Melt",
+      "nameAr": "تونة ميلت",
+      "description": "Crispy Bread",
+      "price": 75,
+      "available": true,
+      "categoryId": "sandwiches"
+    },
+    {
+      "id": "breakfast-full-english",
+      "name": "Full English",
+      "nameAr": "إفطار إنجليزي",
+      "description": "Hearty Start",
+      "price": 120,
+      "bestSeller": true,
+      "available": true,
+      "categoryId": "breakfast"
+    },
+    {
+      "id": "breakfast-pancakes",
+      "name": "Pancakes",
+      "nameAr": "بان كيك",
+      "description": "Fluffy & Sweet",
+      "price": 80,
+      "available": true,
+      "categoryId": "breakfast"
+    },
+    {
+      "id": "breakfast-avocado-toast",
+      "name": "Avocado Toast",
+      "nameAr": "أفوكادو توست",
+      "price": 95,
+      "available": true,
+      "categoryId": "breakfast"
+    }
+  ]
+}

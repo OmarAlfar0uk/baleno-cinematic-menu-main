@@ -1,23 +1,25 @@
 import { useState, useEffect } from "react";
 import { useStore } from "@/store/useStore";
-import { X, ClipboardList, FolderOpen, ShoppingCart, Settings, LogOut, Menu } from "lucide-react";
+import { X, ClipboardList, FolderOpen, ShoppingCart, Settings, LogOut, Menu, BarChart3 } from "lucide-react";
 import balenoLogo from "@/assets/baleno-logo.png";
 import AdminMenuItems from "./AdminMenuItems";
 import AdminCategories from "./AdminCategories";
 import AdminOrders from "./AdminOrders";
 import AdminSettings from "./AdminSettings";
+import AdminReports from "./AdminReports";
 import { motion } from "framer-motion";
 
 interface AdminDashboardProps {
   onClose: () => void;
 }
 
-type Tab = "items" | "categories" | "orders" | "settings";
+type Tab = "items" | "categories" | "orders" | "reports" | "settings";
 
 const navItems: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "items", label: "Menu Items", icon: <ClipboardList size={18} /> },
   { id: "categories", label: "Categories", icon: <FolderOpen size={18} /> },
   { id: "orders", label: "Orders", icon: <ShoppingCart size={18} /> },
+  { id: "reports", label: "Reports", icon: <BarChart3 size={18} /> },
   { id: "settings", label: "Settings", icon: <Settings size={18} /> },
 ];
 
@@ -143,6 +145,7 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
           {activeTab === "items" && <AdminMenuItems />}
           {activeTab === "categories" && <AdminCategories />}
           {activeTab === "orders" && <AdminOrders />}
+          {activeTab === "reports" && <AdminReports />}
           {activeTab === "settings" && <AdminSettings />}
         </div>
       </div>

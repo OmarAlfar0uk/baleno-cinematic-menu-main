@@ -1,15 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface AdminGateProps {
-  onAuthenticated: () => void;
-}
-
-const AdminGate = ({ onAuthenticated }: AdminGateProps) => {
+const AdminGate = () => {
   const [open, setOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -20,7 +16,7 @@ const AdminGate = ({ onAuthenticated }: AdminGateProps) => {
       setOpen(false);
       setPassword("");
       setError(false);
-      onAuthenticated();
+      window.location.assign("/admin/");
     } else {
       setError(true);
       setTimeout(() => setError(false), 600);
@@ -33,7 +29,7 @@ const AdminGate = ({ onAuthenticated }: AdminGateProps) => {
         onClick={() => setOpen(true)}
         className="fixed bottom-6 left-6 z-40 w-10 h-10 rounded-full bg-muted/50 text-muted-foreground
           flex items-center justify-center opacity-30 hover:opacity-100 transition-opacity"
-        title="Admin"
+        title="Content Admin"
       >
         <Settings size={16} />
       </button>
@@ -41,7 +37,10 @@ const AdminGate = ({ onAuthenticated }: AdminGateProps) => {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="bg-card border-border max-w-sm">
           <DialogHeader>
-            <DialogTitle className="font-heading text-gold gold-glow">Admin Access</DialogTitle>
+            <DialogTitle className="font-heading text-gold gold-glow">Content Admin</DialogTitle>
+            <DialogDescription className="text-muted-foreground text-sm">
+              Enter the password to open the publishing dashboard for menu items and images.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <motion.div animate={error ? { x: [0, -10, 10, -10, 10, 0] } : {}} transition={{ duration: 0.4 }}>
@@ -56,7 +55,7 @@ const AdminGate = ({ onAuthenticated }: AdminGateProps) => {
               {error && <p className="text-destructive text-xs mt-1">Wrong password</p>}
             </motion.div>
             <Button type="submit" className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80">
-              Enter Dashboard
+              Open Publishing Dashboard
             </Button>
           </form>
         </DialogContent>

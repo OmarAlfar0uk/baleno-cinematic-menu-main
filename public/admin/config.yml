@@ -1,0 +1,79 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "public/menu-images"
+public_folder: "/menu-images"
+
+logo_url: "/baleno-logo.png"
+
+collections:
+  - name: "site"
+    label: "Site Content"
+    delete: false
+    files:
+      - label: "Menu and Settings"
+        name: "site"
+        file: "src/content/site.json"
+        format: "json"
+        editor:
+          preview: false
+        fields:
+          - label: "Settings"
+            name: "settings"
+            widget: "object"
+            collapsed: true
+            summary: "{{fields.restaurantName}}"
+            fields:
+              - { label: "Restaurant Name", name: "restaurantName", widget: "string" }
+              - { label: "WhatsApp Number", name: "whatsappNumber", widget: "string", hint: "Digits only, with country code and no plus sign." }
+              - { label: "Hero Tagline", name: "heroTagline", widget: "string" }
+              - { label: "Currency", name: "currency", widget: "string" }
+              - { label: "Opening Hours", name: "openingHours", widget: "string" }
+
+          - label: "Branches"
+            name: "branches"
+            widget: "list"
+            collapsed: true
+            summary: "{{fields.name}}"
+            label_singular: "Branch"
+            fields:
+              - { label: "ID", name: "id", widget: "string", hint: "Stable lowercase ID, for example main-branch." }
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "WhatsApp Number", name: "whatsappNumber", widget: "string" }
+              - { label: "Address", name: "address", widget: "string", required: false }
+              - { label: "Active", name: "isActive", widget: "boolean", default: true, required: false }
+
+          - { label: "Default Branch ID", name: "currentBranchId", widget: "string", hint: "Must match one of the branch IDs above." }
+
+          - label: "Categories"
+            name: "categories"
+            widget: "list"
+            collapsed: true
+            summary: "{{fields.label}}"
+            label_singular: "Category"
+            fields:
+              - { label: "ID", name: "id", widget: "string", hint: "Stable lowercase ID, for example hot-drinks." }
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Arabic Label", name: "labelAr", widget: "string", required: false }
+              - { label: "Icon", name: "icon", widget: "string", hint: "Paste one emoji like ☕ or 🍰." }
+
+          - label: "Menu Items"
+            name: "items"
+            widget: "list"
+            collapsed: true
+            summary: "{{fields.name}} - {{fields.categoryId}}"
+            label_singular: "Item"
+            fields:
+              - { label: "ID", name: "id", widget: "string", hint: "Stable lowercase ID, for example hot-drinks-espresso." }
+              - { label: "Category ID", name: "categoryId", widget: "string", hint: "Must match one of the category IDs above." }
+              - { label: "English Name", name: "name", widget: "string" }
+              - { label: "Arabic Name", name: "nameAr", widget: "string" }
+              - { label: "English Description", name: "description", widget: "string", required: false }
+              - { label: "Arabic Description", name: "descriptionAr", widget: "string", required: false }
+              - { label: "Price", name: "price", widget: "number", value_type: "int", min: 0 }
+              - { label: "Image", name: "image", widget: "image", required: false, allow_multiple: false }
+              - { label: "Best Seller", name: "bestSeller", widget: "boolean", default: false, required: false }
+              - { label: "Available", name: "available", widget: "boolean", default: true, required: false }

@@ -1,8 +1,9 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useStore, MenuItem } from "@/store/useStore";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import ProductDetailsModal from "./ProductDetailsModal";
+import { formatCurrency } from "@/lib/utils";
 
 interface MenuCardProps {
   item: MenuItem;
@@ -13,14 +14,15 @@ const MenuCard = ({ item, index }: MenuCardProps) => {
   const addToCart = useStore((s) => s.addToCart);
   const settings = useStore((s) => s.settings);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40 }}
+        whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.5, delay: index * 0.08 }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.5, delay: shouldReduceMotion ? 0 : index * 0.08 }}
         onClick={() => setDetailsOpen(true)}
         className="card-3d glow-border rounded-xl bg-card p-5 flex flex-col gap-3 cursor-pointer group hover:shadow-xl transition-all duration-300"
       >
@@ -32,6 +34,8 @@ const MenuCard = ({ item, index }: MenuCardProps) => {
                 <img
                   src={item.image}
                   alt={item.name}
+                  loading="lazy"
+                  decoding="async"
                   className="image-3d-pic max-h-40 w-auto object-contain p-2"
                 />
               </div>
@@ -55,7 +59,7 @@ const MenuCard = ({ item, index }: MenuCardProps) => {
         )}
 
         <div className="flex items-center justify-between mt-auto pt-2">
-          <span className="price-badge">{item.price} {settings.currency}</span>
+          <span className="price-badge">{formatCurrency(item.price, settings.currency)}</span>
           <button
             onClick={(e) => {
               e.stopPropagation();

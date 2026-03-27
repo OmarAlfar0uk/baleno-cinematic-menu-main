@@ -1,26 +1,35 @@
-import { motion } from "framer-motion";
+import { useMemo } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import balenoLogo from "@/assets/baleno-logo.png";
 
-const Particles = () => {
+interface ParticleSpec {
+  size: number;
+  left: number;
+  duration: number;
+  delay: number;
+  drift: number;
+}
+
+const Particles = ({ particles, shouldReduceMotion }: { particles: ParticleSpec[]; shouldReduceMotion: boolean }) => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {Array.from({ length: 18 }).map((_, i) => (
+      {particles.map((particle, i) => (
         <div
-          key={i}
+          key={`${i}-${particle.left}-${particle.size}`}
           className="absolute rounded-full"
           style={{
-            width: `${Math.random() * 4 + 2}px`,
-            height: `${Math.random() * 4 + 2}px`,
-            left: `${Math.random() * 100}%`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            left: `${particle.left}%`,
             background: i % 2 === 0
               ? "hsl(40 40% 55%)"
               : "hsl(24 100% 55%)",
             boxShadow: i % 2 === 0
               ? "0 0 6px hsl(40 40% 55% / 0.6)"
               : "0 0 6px hsl(24 100% 55% / 0.6)",
-            animation: `particle-float ${8 + Math.random() * 8}s linear infinite`,
-            animationDelay: `${Math.random() * 8}s`,
-            ["--drift" as string]: `${(Math.random() - 0.5) * 100}px`,
+            animation: shouldReduceMotion ? "none" : `particle-float ${particle.duration}s linear infinite`,
+            animationDelay: `${particle.delay}s`,
+            ["--drift" as string]: `${particle.drift}px`,
           }}
         />
       ))}
@@ -29,6 +38,19 @@ const Particles = () => {
 };
 
 const HeroSection = () => {
+  const shouldReduceMotion = useReducedMotion();
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 18 }).map(() => ({
+        size: Math.random() * 4 + 2,
+        left: Math.random() * 100,
+        duration: 8 + Math.random() * 8,
+        delay: Math.random() * 8,
+        drift: (Math.random() - 0.5) * 100,
+      })),
+    []
+  );
+
   const scrollToMenu = () => {
     document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -51,38 +73,40 @@ const HeroSection = () => {
         }}
       />
 
-      <Particles />
+      <Particles particles={particles} shouldReduceMotion={shouldReduceMotion} />
 
       {/* Logo */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.8, ease: "easeOut" }}
         className="relative z-10 mb-6"
       >
         <motion.img
           src={balenoLogo}
           alt="Baleno Logo"
+          loading="eager"
+          decoding="async"
           className="w-32 h-32 md:w-44 md:h-44 object-contain animate-pulse-glow"
-          animate={{ rotateY: [0, 360] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          animate={shouldReduceMotion ? undefined : { rotateY: [0, 360] }}
+          transition={shouldReduceMotion ? undefined : { duration: 12, repeat: Infinity, ease: "linear" }}
         />
       </motion.div>
 
       {/* Title */}
       <motion.h1
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 30 }}
+        animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.8, delay: shouldReduceMotion ? 0 : 0.3 }}
         className="relative z-10 text-gold gold-glow font-heading text-4xl md:text-6xl lg:text-7xl font-bold tracking-wider mb-4 text-center"
       >
         Welcome to Baleno
       </motion.h1>
 
       <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6 }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+        animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.8, delay: shouldReduceMotion ? 0 : 0.6 }}
         className="relative z-10 text-terracotta font-heading text-lg md:text-xl tracking-widest mb-10"
       >
         Est. 2005 — Cairo, Egypt
@@ -90,9 +114,9 @@ const HeroSection = () => {
 
       {/* CTA */}
       <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.9 }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+        animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.8, delay: shouldReduceMotion ? 0 : 0.9 }}
         onClick={scrollToMenu}
         className="relative z-10 group px-8 py-4 rounded-full font-heading text-lg tracking-wider
           bg-gradient-to-r from-accent to-tertiary text-accent-foreground
@@ -108,11 +132,11 @@ const HeroSection = () => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
+        transition={{ delay: shouldReduceMotion ? 0 : 1.5 }}
         className="absolute bottom-8 z-10 flex flex-col items-center gap-2 text-muted-foreground"
       >
         <span className="text-xs tracking-widest uppercase">Scroll</span>
-        <div style={{ animation: "scroll-bounce 2s ease-in-out infinite" }}>
+        <div style={{ animation: shouldReduceMotion ? "none" : "scroll-bounce 2s ease-in-out infinite" }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M10 4L10 16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.5" />
           </svg>

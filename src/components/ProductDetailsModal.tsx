@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MenuItem } from "@/store/useStore";
 import { Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 
 interface ProductDetailsModalProps {
   item: MenuItem | null;
@@ -32,6 +33,8 @@ const ProductDetailsModal = ({ item, open, onOpenChange, onAddToCart, currency }
                   <img
                     src={item.image}
                     alt={item.name}
+                    loading="lazy"
+                    decoding="async"
                     className="image-3d-pic w-full h-[320px] md:h-[380px] object-contain p-4"
                   />
                 </div>
@@ -68,7 +71,7 @@ const ProductDetailsModal = ({ item, open, onOpenChange, onAddToCart, currency }
 
               <div className="pt-2 border-t border-border/50">
                 <p className="text-2xl font-bold text-secondary mb-1">
-                  {item.price} <span className="text-base text-muted-foreground">{currency}</span>
+                  {formatCurrency(item.price, currency)}
                 </p>
               </div>
 

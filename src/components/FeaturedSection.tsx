@@ -1,16 +1,21 @@
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { MenuItem } from "@/store/useStore";
 import ProductDetailsModal from "./ProductDetailsModal";
+import { formatCurrency } from "@/lib/utils";
 
 const FeaturedSection = () => {
   const DRAG_THRESHOLD = 6;
   const { items, settings } = useStore();
-  const featuredItems = items.filter((i) => i.bestSeller && i.available !== false);
+  const featuredItems = useMemo(
+    () => items.filter((i) => i.bestSeller && i.available !== false),
+    [items]
+  );
   const addToCart = useStore((s) => s.addToCart);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const preventClickRef = useRef(false);
@@ -107,10 +112,10 @@ const FeaturedSection = () => {
         {featuredItems.slice(0, 5).map((item, i) => (
           <motion.div
             key={item.id}
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 40 }}
+            whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: shouldReduceMotion ? 0 : i * 0.1 }}
             onClick={() => {
               setSelectedItem(item);
               setDetailsOpen(true);
@@ -127,7 +132,13 @@ const FeaturedSection = () => {
               <div className="image-3d-scene mb-4 flex justify-center">
                 <div className="image-3d-frame inline-flex rounded-xl overflow-hidden border border-border/60 bg-gradient-to-br from-[#160c06] to-[#2a160c] shadow-[inset_0_0_0_1px_hsl(30_25%_35%/0.15)]">
                   <div className="image-3d-spinner inline-flex">
-                    <img src={item.image} alt={item.name} className="image-3d-pic max-h-40 w-auto object-contain p-3" />
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="image-3d-pic max-h-40 w-auto object-contain p-3"
+                      />
                   </div>
                 </div>
               </div>
@@ -138,7 +149,7 @@ const FeaturedSection = () => {
               <p className="text-muted-foreground text-sm mb-4">{item.description}</p>
             )}
             <div className="flex items-center justify-between">
-              <span className="price-badge">{item.price} {settings.currency}</span>
+              <span className="price-badge">{formatCurrency(item.price, settings.currency)}</span>
               <button
                 onClick={(event) => {
                   event.stopPropagation();
