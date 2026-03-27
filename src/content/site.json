@@ -11,17 +11,48 @@
       "id": "main-branch",
       "name": "Baleno Main Branch",
       "whatsappNumber": "201226801925",
+      "address": "",
       "isActive": true
     }
   ],
   "currentBranchId": "main-branch",
   "categories": [
-    { "id": "hot-drinks", "label": "Hot Drinks", "labelAr": "مشروبات ساخنة", "icon": "☕" },
-    { "id": "cold-drinks", "label": "Cold Drinks", "labelAr": "مشروبات باردة", "icon": "🧊" },
-    { "id": "fresh-juices", "label": "Fresh Juices", "labelAr": "عصائر فريش", "icon": "🥤" },
-    { "id": "desserts", "label": "Desserts", "labelAr": "حلويات", "icon": "🍰" },
-    { "id": "sandwiches", "label": "Sandwiches", "labelAr": "ساندوتشات", "icon": "🥪" },
-    { "id": "breakfast", "label": "Breakfast", "labelAr": "فطار", "icon": "🍳" }
+    {
+      "id": "hot-drinks",
+      "label": "Hot Drinks",
+      "labelAr": "مشروبات ساخنة",
+      "icon": "☕"
+    },
+    {
+      "id": "cold-drinks",
+      "label": "Cold Drinks",
+      "labelAr": "مشروبات باردة",
+      "icon": "🧊"
+    },
+    {
+      "id": "fresh-juices",
+      "label": "Fresh Juices",
+      "labelAr": "عصائر فريش",
+      "icon": "🥤"
+    },
+    {
+      "id": "desserts",
+      "label": "Desserts",
+      "labelAr": "حلويات",
+      "icon": "🍰"
+    },
+    {
+      "id": "sandwiches",
+      "label": "Sandwiches",
+      "labelAr": "ساندوتشات",
+      "icon": "🥪"
+    },
+    {
+      "id": "breakfast",
+      "label": "Breakfast",
+      "labelAr": "فطار",
+      "icon": "🍳"
+    }
   ],
   "items": [
     {
@@ -29,7 +60,9 @@
       "name": "Espresso",
       "nameAr": "إسبريسو",
       "description": "Rich & Bold",
+      "descriptionAr": "",
       "price": 30,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "hot-drinks"
@@ -39,7 +72,9 @@
       "name": "Cappuccino",
       "nameAr": "كابتشينو",
       "description": "Creamy Foam",
+      "descriptionAr": "",
       "price": 45,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "hot-drinks"
@@ -49,7 +84,10 @@
       "name": "Turkish Coffee",
       "nameAr": "قهوة تركي",
       "description": "Traditional",
+      "descriptionAr": "",
       "price": 35,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "hot-drinks"
     },
@@ -58,7 +96,10 @@
       "name": "Hot Chocolate",
       "nameAr": "شوكولاتة ساخنة",
       "description": "Velvety",
+      "descriptionAr": "",
       "price": 50,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "hot-drinks"
     },
@@ -67,7 +108,10 @@
       "name": "Iced Latte",
       "nameAr": "لاتيه بارد",
       "description": "Chilled Perfection",
+      "descriptionAr": "",
       "price": 55,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "cold-drinks"
     },
@@ -76,7 +120,9 @@
       "name": "Frappuccino",
       "nameAr": "فرابتشينو",
       "description": "Blended Magic",
+      "descriptionAr": "",
       "price": 60,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "cold-drinks"
@@ -86,7 +132,10 @@
       "name": "Iced Matcha",
       "nameAr": "ماتشا بارد",
       "description": "Japanese Vibes",
+      "descriptionAr": "",
       "price": 65,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "cold-drinks"
     },
@@ -95,7 +144,10 @@
       "name": "Cold Brew",
       "nameAr": "كولد برو",
       "description": "Slow Steeped",
+      "descriptionAr": "",
       "price": 60,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "cold-drinks"
     },
@@ -103,7 +155,10 @@
       "id": "fresh-juices-mango",
       "name": "Mango",
       "nameAr": "مانجو",
+      "description": "",
+      "descriptionAr": "",
       "price": 40,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "fresh-juices"
@@ -112,7 +167,11 @@
       "id": "fresh-juices-orange",
       "name": "Orange",
       "nameAr": "برتقال",
+      "description": "",
+      "descriptionAr": "",
       "price": 35,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "fresh-juices"
     },
@@ -120,7 +179,11 @@
       "id": "fresh-juices-mixed-berry",
       "name": "Mixed Berry",
       "nameAr": "فراولة مكس",
+      "description": "",
+      "descriptionAr": "",
       "price": 50,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "fresh-juices"
     },
@@ -129,7 +192,9 @@
       "name": "Tiramisu",
       "nameAr": "تيراميسو",
       "description": "Italian Classic",
+      "descriptionAr": "",
       "price": 70,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "desserts"
@@ -139,7 +204,10 @@
       "name": "Cheesecake",
       "nameAr": "تشيزكيك",
       "description": "NY Style",
+      "descriptionAr": "",
       "price": 65,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "desserts"
     },
@@ -148,7 +216,10 @@
       "name": "Brownie",
       "nameAr": "براوني",
       "description": "Warm & Gooey",
+      "descriptionAr": "",
       "price": 55,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "desserts"
     },
@@ -157,7 +228,10 @@
       "name": "Club Sandwich",
       "nameAr": "كلاب ساندوتش",
       "description": "Triple Deck",
+      "descriptionAr": "",
       "price": 85,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "sandwiches"
     },
@@ -166,7 +240,9 @@
       "name": "Grilled Chicken",
       "nameAr": "دجاج مشوي",
       "description": "Smoky Flavor",
+      "descriptionAr": "",
       "price": 90,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "sandwiches"
@@ -176,7 +252,10 @@
       "name": "Tuna Melt",
       "nameAr": "تونة ميلت",
       "description": "Crispy Bread",
+      "descriptionAr": "",
       "price": 75,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "sandwiches"
     },
@@ -185,7 +264,9 @@
       "name": "Full English",
       "nameAr": "إفطار إنجليزي",
       "description": "Hearty Start",
+      "descriptionAr": "",
       "price": 120,
+      "image": "",
       "bestSeller": true,
       "available": true,
       "categoryId": "breakfast"
@@ -195,7 +276,10 @@
       "name": "Pancakes",
       "nameAr": "بان كيك",
       "description": "Fluffy & Sweet",
+      "descriptionAr": "",
       "price": 80,
+      "image": "",
+      "bestSeller": false,
       "available": true,
       "categoryId": "breakfast"
     },
@@ -203,7 +287,11 @@
       "id": "breakfast-avocado-toast",
       "name": "Avocado Toast",
       "nameAr": "أفوكادو توست",
+      "description": "",
+      "descriptionAr": "",
       "price": 95,
+      "image": "/menu-images/avocado-toast-breakfast-avocado-toast.jpg",
+      "bestSeller": false,
       "available": true,
       "categoryId": "breakfast"
     }
