@@ -15,8 +15,6 @@ declare global {
 }
 
 const GIT_GATEWAY_BASE = "/.netlify/git/github";
-const REPO_OWNER = "OmarAlfar0uk";
-const REPO_NAME = "baleno-cinematic-menu-main";
 const REPO_BRANCH = "main";
 const CONTENT_PATH = "src/content/site.json";
 const MEDIA_DIR = "public/menu-images";
@@ -106,7 +104,7 @@ async function requestGitGateway<T>(path: string, init?: RequestInit) {
 async function getRepositoryContent(path: string) {
   try {
     return await requestGitGateway<RepositoryContent>(
-      `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}?ref=${REPO_BRANCH}`
+      `/contents/${path}?ref=${REPO_BRANCH}`
     );
   } catch (error) {
     const typedError = error as Error & { status?: number };
@@ -156,7 +154,7 @@ async function upsertRepositoryFile(path: string, contentBase64: string, message
   const existing = await getRepositoryContent(path);
 
   return requestGitGateway(
-    `/repos/${REPO_OWNER}/${REPO_NAME}/contents/${path}`,
+    `/contents/${path}`,
     {
       method: "PUT",
       body: JSON.stringify({
