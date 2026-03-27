@@ -134,9 +134,15 @@ function inferExtensionFromDataUrl(dataUrl: string) {
   const match = dataUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
   const mimeType = match?.[1] || "image/jpeg";
 
+  if (mimeType === "image/jpeg") return "jpg";
   if (mimeType === "image/png") return "png";
   if (mimeType === "image/webp") return "webp";
   if (mimeType === "image/gif") return "gif";
+  if (mimeType === "image/bmp") return "bmp";
+  if (mimeType === "image/avif") return "avif";
+  if (mimeType === "image/heic") return "heic";
+  if (mimeType === "image/heif") return "heif";
+  if (mimeType === "image/svg+xml") return "svg";
   return "jpg";
 }
 

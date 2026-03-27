@@ -41,7 +41,37 @@ const emptyForm = {
   available: true,
 };
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string" && reader.result.startsWith("data:image/")) {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error("Image read failed"));
+    };
+    reader.onerror = () => reject(new Error("Image read failed"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function canRenderImage(src: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const image = new Image();
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+    image.src = src;
+  });
+}
+
 async function compressImage(file: File): Promise<string> {
+  const originalDataUrl = await readFileAsDataUrl(file);
+  if (file.type === "image/svg+xml") {
+    return originalDataUrl;
+  }
+
   const imageUrl = URL.createObjectURL(file);
 
   try {
@@ -68,7 +98,15 @@ async function compressImage(file: File): Promise<string> {
 
     const outputType = file.type === "image/png" ? "image/webp" : "image/jpeg";
     const quality = file.size > 2 * 1024 * 1024 ? 0.72 : 0.82;
-    return canvas.toDataURL(outputType, quality);
+    const optimizedDataUrl = canvas.toDataURL(outputType, quality);
+
+    if (!optimizedDataUrl.startsWith("data:image/") || optimizedDataUrl === "data:,") {
+      return originalDataUrl;
+    }
+
+    return (await canRenderImage(optimizedDataUrl)) ? optimizedDataUrl : originalDataUrl;
+  } catch {
+    return originalDataUrl;
   } finally {
     URL.revokeObjectURL(imageUrl);
   }
@@ -84,6 +122,7 @@ const AdminMenuItems = () => {
   const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>("all");
   const [sortBy, setSortBy] = useState<ItemSort>("newest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [imagePreviewBroken, setImagePreviewBroken] = useState(false);
   const pendingDeleteTimersRef = useRef<Map<string, number>>(new Map());
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,6 +141,7 @@ const AdminMenuItems = () => {
 
     compressImage(file)
       .then((result) => {
+        setImagePreviewBroken(false);
         setForm((prev) => ({ ...prev, image: result }));
         toast.success("Image uploaded and optimized");
       })
@@ -112,12 +152,14 @@ const AdminMenuItems = () => {
 
   const openAdd = () => {
     setEditingId(null);
+    setImagePreviewBroken(false);
     setForm({ ...emptyForm, categoryId: categories[0]?.id || "" });
     setModalOpen(true);
   };
 
   const openEdit = (item: MenuItem) => {
     setEditingId(item.id);
+    setImagePreviewBroken(false);
     setForm({
       name: item.name,
       nameAr: item.nameAr,
@@ -539,7 +581,10 @@ const AdminMenuItems = () => {
                 </label>
                 {form.image && (
                   <button
-                    onClick={() => setForm({ ...form, image: "" })}
+                    onClick={() => {
+                      setImagePreviewBroken(false);
+                      setForm({ ...form, image: "" });
+                    }}
                     className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
                   >
                     <X size={16} />
@@ -548,7 +593,18 @@ const AdminMenuItems = () => {
               </div>
               {form.image && (
                 <div className="mt-3 rounded-lg overflow-hidden">
-                  <img src={form.image} alt="Preview" className="w-full h-40 object-cover" />
+                  {imagePreviewBroken ? (
+                    <div className="w-full h-40 rounded-lg border border-border bg-muted/40 flex items-center justify-center text-xs text-muted-foreground text-center px-4">
+                      This image could not be previewed. Please choose another file.
+                    </div>
+                  ) : (
+                    <img
+                      src={form.image}
+                      alt="Preview"
+                      className="w-full h-40 object-cover"
+                      onError={() => setImagePreviewBroken(true)}
+                    />
+                  )}
                 </div>
               )}
             </div>
