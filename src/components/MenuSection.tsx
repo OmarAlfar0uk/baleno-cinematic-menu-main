@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { MenuCategory, MenuItem } from "@/store/useStore";
 import MenuCard from "./MenuCard";
 
@@ -7,14 +7,17 @@ interface MenuSectionProps {
 }
 
 const MenuSection = ({ category }: MenuSectionProps) => {
+  const shouldReduceMotion = useReducedMotion();
+
   if (category.items.length === 0) return null;
 
   return (
     <section id={`category-${category.id}`} className="py-12 scroll-mt-28">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 14 }}
+        whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.35 }}
         className="flex items-center gap-4 mb-8"
       >
         <span className="text-3xl">{category.icon}</span>

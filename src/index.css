@@ -52,6 +52,8 @@
   body {
     @apply bg-background text-foreground;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cinzel', serif;
@@ -104,13 +106,9 @@
   }
 
   .card-3d {
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s ease;
-    transform-style: preserve-3d;
-  }
-
-  .card-3d:hover {
-    transform: perspective(1000px) rotateX(3deg) rotateY(3deg) translateZ(20px);
-    box-shadow: var(--card-hover-glow), 0 25px 50px -12px rgba(0,0,0,0.5);
+    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 280ms ease;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .image-3d-scene {
@@ -121,7 +119,6 @@
     position: relative;
     transform-style: preserve-3d;
     transition: box-shadow 320ms ease;
-    will-change: transform;
   }
 
   .image-3d-frame::before {
@@ -152,26 +149,12 @@
   .image-3d-pic {
     transform: translateZ(20px);
     transition: filter 320ms ease;
-    will-change: transform;
     backface-visibility: hidden;
   }
 
   .image-3d-spinner {
     transform-style: preserve-3d;
     transition: none;
-    will-change: transform;
-  }
-
-  .image-3d-scene:hover .image-3d-frame {
-    box-shadow: 0 14px 24px -18px hsl(20 50% 4% / 0.8);
-  }
-
-  .image-3d-scene:hover .image-3d-frame::after {
-    opacity: 1;
-  }
-
-  .image-3d-scene:hover .image-3d-pic {
-    filter: drop-shadow(0 10px 12px hsl(var(--accent) / 0.3));
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -199,12 +182,8 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 280ms ease;
     pointer-events: none;
-  }
-
-  .glow-border:hover::after {
-    opacity: 1;
   }
 
   .price-badge {
@@ -230,8 +209,7 @@
       hsl(var(--secondary) / 0.1) 50%,
       transparent 67%
     );
-    background-size: 300% 100%;
-    animation: shimmer 3s infinite;
+    background-size: 220% 100%;
   }
 
   .steam {
@@ -249,6 +227,33 @@
     filter: blur(8px);
     animation: steam-rise 3s ease-in-out infinite;
     transform: translateX(-50%);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-3d:hover {
+    transform: perspective(1000px) rotateX(2.5deg) rotateY(2.5deg) translateZ(12px);
+    box-shadow: var(--card-hover-glow), 0 20px 38px -18px rgba(0,0,0,0.45);
+  }
+
+  .image-3d-scene:hover .image-3d-frame {
+    box-shadow: 0 14px 24px -18px hsl(20 50% 4% / 0.8);
+  }
+
+  .image-3d-scene:hover .image-3d-frame::after {
+    opacity: 1;
+  }
+
+  .image-3d-scene:hover .image-3d-pic {
+    filter: drop-shadow(0 10px 12px hsl(var(--accent) / 0.3));
+  }
+
+  .glow-border:hover::after {
+    opacity: 1;
+  }
+
+  .shimmer {
+    animation: shimmer 4.5s linear infinite;
   }
 }
 
@@ -341,4 +346,3 @@
     transform: none !important;
   }
 }
-

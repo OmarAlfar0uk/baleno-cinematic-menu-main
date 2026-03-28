@@ -19,12 +19,12 @@ const MenuCard = ({ item, index }: MenuCardProps) => {
   return (
     <>
       <motion.div
-        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 40 }}
+        initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
         whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: shouldReduceMotion ? 0.2 : 0.5, delay: shouldReduceMotion ? 0 : index * 0.08 }}
+        viewport={{ once: true, amount: 0.15, margin: "0px 0px -40px 0px" }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.38, delay: shouldReduceMotion ? 0 : index * 0.05 }}
         onClick={() => setDetailsOpen(true)}
-        className="card-3d glow-border rounded-xl bg-card p-5 flex flex-col gap-3 cursor-pointer group hover:shadow-xl transition-all duration-300"
+        className="card-3d glow-border rounded-xl bg-card p-5 flex flex-col gap-3 cursor-pointer group hover:shadow-xl transition-shadow duration-300"
       >
         {/* Image Section */}
         {item.image && (

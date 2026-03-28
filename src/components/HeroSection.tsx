@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import balenoLogo from "@/assets/baleno-logo.png";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ParticleSpec {
   size: number;
@@ -39,16 +40,18 @@ const Particles = ({ particles, shouldReduceMotion }: { particles: ParticleSpec[
 
 const HeroSection = () => {
   const shouldReduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  const allowAmbientMotion = !shouldReduceMotion && !isMobile;
   const particles = useMemo(
     () =>
-      Array.from({ length: 18 }).map(() => ({
+      Array.from({ length: isMobile ? 10 : 14 }).map(() => ({
         size: Math.random() * 4 + 2,
         left: Math.random() * 100,
-        duration: 8 + Math.random() * 8,
+        duration: 10 + Math.random() * 6,
         delay: Math.random() * 8,
-        drift: (Math.random() - 0.5) * 100,
+        drift: (Math.random() - 0.5) * (isMobile ? 45 : 80),
       })),
-    []
+    [isMobile]
   );
 
   const scrollToMenu = () => {
@@ -59,7 +62,7 @@ const HeroSection = () => {
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-espresso">
       {/* Animated gradient background */}
       <div
-        className="absolute inset-0 animate-gradient-shift"
+        className={`absolute inset-0 ${allowAmbientMotion ? "animate-gradient-shift" : ""}`}
         style={{
           background: "linear-gradient(135deg, hsl(20 45% 8%), hsl(20 45% 5%), hsl(20 45% 10%))",
         }}
@@ -73,7 +76,7 @@ const HeroSection = () => {
         }}
       />
 
-      <Particles particles={particles} shouldReduceMotion={shouldReduceMotion} />
+      <Particles particles={particles} shouldReduceMotion={!allowAmbientMotion} />
 
       {/* Logo */}
       <motion.div
@@ -87,9 +90,9 @@ const HeroSection = () => {
           alt="Baleno Logo"
           loading="eager"
           decoding="async"
-          className="w-32 h-32 md:w-44 md:h-44 object-contain animate-pulse-glow"
-          animate={shouldReduceMotion ? undefined : { rotateY: [0, 360] }}
-          transition={shouldReduceMotion ? undefined : { duration: 12, repeat: Infinity, ease: "linear" }}
+          className={`w-32 h-32 md:w-44 md:h-44 object-contain ${allowAmbientMotion ? "animate-pulse-glow" : ""}`}
+          animate={allowAmbientMotion ? { rotateY: [0, 360] } : undefined}
+          transition={allowAmbientMotion ? { duration: 12, repeat: Infinity, ease: "linear" } : undefined}
         />
       </motion.div>
 
@@ -136,7 +139,7 @@ const HeroSection = () => {
         className="absolute bottom-8 z-10 flex flex-col items-center gap-2 text-muted-foreground"
       >
         <span className="text-xs tracking-widest uppercase">Scroll</span>
-        <div style={{ animation: shouldReduceMotion ? "none" : "scroll-bounce 2s ease-in-out infinite" }}>
+        <div style={{ animation: allowAmbientMotion ? "scroll-bounce 2s ease-in-out infinite" : "none" }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M10 4L10 16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.5" />
           </svg>

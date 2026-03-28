@@ -1,9 +1,11 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { MenuItem } from "@/store/useStore";
 import ProductDetailsModal from "./ProductDetailsModal";
 import { formatCurrency } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { warmImageBatch } from "@/lib/imageWarmup";
 
 const FeaturedSection = () => {
   const DRAG_THRESHOLD = 6;
@@ -16,15 +18,26 @@ const FeaturedSection = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const preventClickRef = useRef(false);
+  const enablePointerDrag = !isMobile;
   const dragState = useRef({
     pointerId: -1,
     startX: 0,
     startScrollLeft: 0,
     hasDragged: false,
   });
+  const featuredImageUrls = useMemo(
+    () => featuredItems.map((item) => item.image).filter((image): image is string => Boolean(image)),
+    [featuredItems]
+  );
+
+  useEffect(() => {
+    if (featuredImageUrls.length === 0) return;
+    warmImageBatch(featuredImageUrls, 4);
+  }, [featuredImageUrls]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     const container = scrollRef.current;
@@ -88,7 +101,8 @@ const FeaturedSection = () => {
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: shouldReduceMotion ? 0.2 : 0.35 }}
         className="mb-8"
       >
         <h2 className="font-heading text-3xl md:text-4xl text-gold gold-glow tracking-wider text-center">
@@ -99,30 +113,31 @@ const FeaturedSection = () => {
 
       <div
         ref={scrollRef}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerLeave={handlePointerUp}
-        onPointerCancel={handlePointerUp}
-        onClickCapture={handleClickCapture}
-        className={`flex gap-5 overflow-x-auto pb-4 px-2 snap-x snap-mandatory scrollbar-hide select-none touch-pan-y ${
-          isDragging ? "cursor-grabbing" : "cursor-grab"
+        onPointerDown={enablePointerDrag ? handlePointerDown : undefined}
+        onPointerMove={enablePointerDrag ? handlePointerMove : undefined}
+        onPointerUp={enablePointerDrag ? handlePointerUp : undefined}
+        onPointerLeave={enablePointerDrag ? handlePointerUp : undefined}
+        onPointerCancel={enablePointerDrag ? handlePointerUp : undefined}
+        onClickCapture={enablePointerDrag ? handleClickCapture : undefined}
+        className={`flex gap-5 overflow-x-auto overscroll-x-contain pb-4 px-2 snap-x snap-mandatory scrollbar-hide select-none ${
+          enablePointerDrag ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
         }`}
+        style={{ WebkitOverflowScrolling: "touch" }}
       >
         {featuredItems.slice(0, 5).map((item, i) => (
           <motion.div
             key={item.id}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 40 }}
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 24 }}
             whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: shouldReduceMotion ? 0 : i * 0.1 }}
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: shouldReduceMotion ? 0.2 : 0.35, delay: shouldReduceMotion ? 0 : i * 0.06 }}
             onClick={() => {
               setSelectedItem(item);
               setDetailsOpen(true);
             }}
             className="shrink-0 w-64 md:w-72 snap-center rounded-2xl bg-card p-6
-              shimmer border border-border/50 hover:border-tertiary/50
-              transition-all duration-500 group card-3d cursor-pointer"
+              border border-border/50 hover:border-tertiary/50
+              transition-shadow duration-300 group card-3d cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-3">
               <span className="text-accent-orange text-lg">⚡</span>
@@ -135,8 +150,9 @@ const FeaturedSection = () => {
                       <img
                         src={item.image}
                         alt={item.name}
-                        loading="lazy"
+                        loading="eager"
                         decoding="async"
+                        fetchPriority={i < 3 ? "high" : "auto"}
                         className="image-3d-pic max-h-40 w-auto object-contain p-3"
                       />
                   </div>

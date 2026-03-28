@@ -10,7 +10,7 @@ const OpeningCurtain = ({ onComplete }: OpeningCurtainProps) => {
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const timer = window.setTimeout(onComplete, shouldReduceMotion ? 250 : 3200);
+    const timer = window.setTimeout(onComplete, shouldReduceMotion ? 250 : 2500);
     return () => window.clearTimeout(timer);
   }, [onComplete, shouldReduceMotion]);
 
@@ -18,20 +18,20 @@ const OpeningCurtain = ({ onComplete }: OpeningCurtainProps) => {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
-      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, filter: "blur(3px)" }}
-      transition={{ duration: shouldReduceMotion ? 0.2 : 0.6, ease: "easeOut" }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: shouldReduceMotion ? 0.2 : 0.45, ease: [0.22, 1, 0.36, 1] }}
       className="fixed inset-0 z-[120] pointer-events-none overflow-hidden bg-[#110803]"
     >
       <motion.div
         initial={{ opacity: 1 }}
         animate={{ opacity: 0 }}
-        transition={{ delay: shouldReduceMotion ? 0 : 2.35, duration: shouldReduceMotion ? 0.2 : 0.6, ease: "easeOut" }}
+        transition={{ delay: shouldReduceMotion ? 0 : 1.85, duration: shouldReduceMotion ? 0.2 : 0.4, ease: [0.22, 1, 0.36, 1] }}
         className="absolute inset-0"
       >
         <motion.div
           initial={{ x: 0, scaleX: 1 }}
           animate={shouldReduceMotion ? { opacity: 1 } : { x: "-103%", scaleX: 0.985 }}
-          transition={shouldReduceMotion ? { duration: 0.2 } : { delay: 1.0, duration: 1.55, ease: [0.19, 1, 0.22, 1] }}
+          transition={shouldReduceMotion ? { duration: 0.2 } : { delay: 0.7, duration: 1.15, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-y-0 left-0 w-1/2"
           style={{
             background:
@@ -44,7 +44,7 @@ const OpeningCurtain = ({ onComplete }: OpeningCurtainProps) => {
         <motion.div
           initial={{ x: 0, scaleX: 1 }}
           animate={shouldReduceMotion ? { opacity: 1 } : { x: "103%", scaleX: 0.985 }}
-          transition={shouldReduceMotion ? { duration: 0.2 } : { delay: 1.0, duration: 1.55, ease: [0.19, 1, 0.22, 1] }}
+          transition={shouldReduceMotion ? { duration: 0.2 } : { delay: 0.7, duration: 1.15, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-y-0 right-0 w-1/2"
           style={{
             background:
@@ -60,7 +60,7 @@ const OpeningCurtain = ({ onComplete }: OpeningCurtainProps) => {
       <motion.div
         initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
         animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [0, 1, 1, 0], y: [12, 0, 0, -8] }}
-        transition={shouldReduceMotion ? { duration: 0.2 } : { duration: 2.8, times: [0, 0.25, 0.75, 1], ease: "easeInOut" }}
+        transition={shouldReduceMotion ? { duration: 0.2 } : { duration: 2.1, times: [0, 0.2, 0.78, 1], ease: "easeInOut" }}
         className="absolute inset-0 flex flex-col items-center justify-center gap-3"
       >
         <motion.img

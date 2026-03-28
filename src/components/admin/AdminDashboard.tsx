@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/store/useStore";
 import { X, ClipboardList, FolderOpen, ShoppingCart, Settings, LogOut, Menu, BarChart3, CloudUpload, Link2, Unplug } from "lucide-react";
 import balenoLogo from "@/assets/baleno-logo.png";
@@ -38,7 +38,10 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [publishingSession, setPublishingSession] = useState<PublishingSession>(getPublishingSession());
   const [isPublishing, setIsPublishing] = useState(false);
+  const [showOverview, setShowOverview] = useState(true);
   const { items, categories, orders, updateItem } = useStore();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const lastScrollTopRef = useRef(0);
 
   useEffect(() => {
     const t = setInterval(() => setClock(new Date()), 1000);
@@ -48,6 +51,35 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
   useEffect(() => {
     void refreshPublishingSession(setPublishingSession);
   }, []);
+
+  useEffect(() => {
+    const container = contentRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const nextScrollTop = container.scrollTop;
+      const delta = nextScrollTop - lastScrollTopRef.current;
+
+      if (nextScrollTop <= 16) {
+        setShowOverview(true);
+      } else if (delta > 10) {
+        setShowOverview(false);
+      } else if (delta < -10) {
+        setShowOverview(true);
+      }
+
+      lastScrollTopRef.current = nextScrollTop;
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setShowOverview(true);
+    lastScrollTopRef.current = 0;
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [activeTab]);
 
   const todayOrders = orders.filter(
     (o) => new Date(o.timestamp).toDateString() === new Date().toDateString()
@@ -200,60 +232,67 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
           </div>
         </header>
 
-        <div className="px-4 lg:px-6 pt-4 shrink-0">
-          <div className="rounded-xl border border-border bg-card px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                {publishingSession.authenticated
-                  ? `Publishing ready: ${publishingSession.repo || "GitHub repository"}`
-                  : "Publishing locked. Log in again from the admin entry to publish."}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Keep using your classic dashboard. When you finish editing, press <span className="font-semibold text-foreground">Publish Live</span> to commit the latest menu and images, then let Vercel redeploy automatically.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2">
-              {publishingSession.authenticated ? (
-                <Button type="button" variant="outline" onClick={handleDisconnectPublishing} className="gap-2">
-                  <Unplug size={14} /> Sign Out
-                </Button>
-              ) : (
+        <motion.div
+          initial={false}
+          animate={showOverview ? { height: "auto", opacity: 1, y: 0 } : { height: 0, opacity: 0, y: -16 }}
+          transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          className="overflow-hidden shrink-0"
+        >
+          <div className="px-4 lg:px-6 pt-4">
+            <div className="rounded-xl border border-border bg-card px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {publishingSession.authenticated
+                    ? `Publishing ready: ${publishingSession.repo || "GitHub repository"}`
+                    : "Publishing locked. Log in again from the admin entry to publish."}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Keep using your classic dashboard. When you finish editing, press <span className="font-semibold text-foreground">Publish Live</span> to commit the latest menu and images, then let Vercel redeploy automatically.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                {publishingSession.authenticated ? (
+                  <Button type="button" variant="outline" onClick={handleDisconnectPublishing} className="gap-2">
+                    <Unplug size={14} /> Sign Out
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => window.location.assign("/admin")}
+                    className="gap-2"
+                  >
+                    <Link2 size={14} /> Unlock Publishing
+                  </Button>
+                )}
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={() => window.location.assign("/admin")}
-                  className="gap-2"
+                  onClick={handlePublishLive}
+                  disabled={isPublishing || !publishingSession.authenticated}
+                  className="md:hidden bg-[#22c55e] hover:bg-[#16a34a] text-white gap-2"
                 >
-                  <Link2 size={14} /> Unlock Publishing
+                  <CloudUpload size={15} />
+                  {isPublishing ? "Publishing..." : "Publish Live"}
                 </Button>
-              )}
-              <Button
-                type="button"
-                onClick={handlePublishLive}
-                disabled={isPublishing || !publishingSession.authenticated}
-                className="md:hidden bg-[#22c55e] hover:bg-[#16a34a] text-white gap-2"
-              >
-                <CloudUpload size={15} />
-                {isPublishing ? "Publishing..." : "Publish Live"}
-              </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 p-4 lg:p-6 shrink-0">
-          {[
-            { label: "Total Items", value: items.length },
-            { label: "Categories", value: categories.length },
-            { label: "Today's Orders", value: todayOrders },
-          ].map((s) => (
-            <div key={s.label} className="rounded-xl bg-card border border-border p-3 lg:p-4">
-              <p className="text-muted-foreground text-xs uppercase tracking-wider">{s.label}</p>
-              <p className="font-heading text-xl lg:text-2xl text-gold mt-1">{s.value}</p>
-            </div>
-          ))}
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 p-4 lg:p-6">
+            {[
+              { label: "Total Items", value: items.length },
+              { label: "Categories", value: categories.length },
+              { label: "Today's Orders", value: todayOrders },
+            ].map((s) => (
+              <div key={s.label} className="rounded-xl bg-card border border-border p-3 lg:p-4">
+                <p className="text-muted-foreground text-xs uppercase tracking-wider">{s.label}</p>
+                <p className="font-heading text-xl lg:text-2xl text-gold mt-1">{s.value}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
-        <div className="flex-1 overflow-y-auto scrollbar-hide px-4 lg:px-6 pb-6">
+        <div ref={contentRef} className="flex-1 overflow-y-auto scrollbar-hide px-4 lg:px-6 pb-6">
           {activeTab === "items" && <AdminMenuItems />}
           {activeTab === "categories" && <AdminCategories />}
           {activeTab === "orders" && <AdminOrders />}

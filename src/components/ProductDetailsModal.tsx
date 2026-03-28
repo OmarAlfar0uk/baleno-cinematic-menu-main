@@ -33,8 +33,9 @@ const ProductDetailsModal = ({ item, open, onOpenChange, onAddToCart, currency }
                   <img
                     src={item.image}
                     alt={item.name}
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
+                    fetchPriority="high"
                     className="image-3d-pic w-full h-[320px] md:h-[380px] object-contain p-4"
                   />
                 </div>

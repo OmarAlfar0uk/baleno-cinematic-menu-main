@@ -9,6 +9,7 @@ import { useStore, type Branch, type MenuCategory, type MenuItem, type Settings 
 import { AnimatePresence, motion } from "framer-motion";
 import { fetchPublishedSiteDraft } from "@/lib/netlifyPublishing";
 import { normalizePublishedContent } from "@/lib/publishedContent";
+import { warmImageBatch } from "@/lib/imageWarmup";
 
 const INTRO_SEEN_KEY = "baleno-intro-seen";
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard"));
@@ -114,6 +115,22 @@ const Index = ({ openAdminOnLoad = false }: IndexProps) => {
       })),
     [categories, items]
   );
+  const imageUrls = useMemo(
+    () => items.map((item) => item.image).filter((image): image is string => Boolean(image)),
+    [items]
+  );
+
+  useEffect(() => {
+    if (!introDone || imageUrls.length === 0) return;
+
+    warmImageBatch(imageUrls.slice(0, 8), 6);
+
+    const timer = window.setTimeout(() => {
+      warmImageBatch(imageUrls.slice(8));
+    }, 120);
+
+    return () => window.clearTimeout(timer);
+  }, [imageUrls, introDone]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -124,7 +141,7 @@ const Index = ({ openAdminOnLoad = false }: IndexProps) => {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: introDone ? 1 : 0 }}
-        transition={{ duration: 0.9, ease: "easeInOut" }}
+        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
       >
         <HeroSection />
 
