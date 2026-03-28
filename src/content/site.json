@@ -242,7 +242,7 @@
       "description": "Smoky Flavor",
       "descriptionAr": "",
       "price": 90,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702920/baleno-menu/u7zjzn0fj4s5unj0kiai.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "sandwiches"
