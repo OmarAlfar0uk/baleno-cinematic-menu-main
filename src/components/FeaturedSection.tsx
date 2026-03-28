@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { MenuItem } from "@/store/useStore";
@@ -7,6 +7,7 @@ import { formatCurrency } from "@/lib/utils";
 import { warmImageBatch } from "@/lib/imageWarmup";
 
 const FeaturedSection = () => {
+  const DRAG_THRESHOLD = 6;
   const { items, settings } = useStore();
   const featuredItems = useMemo(
     () => items.filter((i) => i.bestSeller && i.available !== false),
@@ -16,6 +17,15 @@ const FeaturedSection = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const preventClickRef = useRef(false);
+  const dragState = useRef({
+    pointerId: -1,
+    startX: 0,
+    startScrollLeft: 0,
+    hasDragged: false,
+  });
   const featuredImageUrls = useMemo(
     () => featuredItems.map((item) => item.image).filter((image): image is string => Boolean(image)),
     [featuredItems]
@@ -25,6 +35,65 @@ const FeaturedSection = () => {
     if (featuredImageUrls.length === 0) return;
     warmImageBatch(featuredImageUrls, 4);
   }, [featuredImageUrls]);
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const target = event.target as HTMLElement;
+    if (target.closest("button, a, input, textarea, select, [role='button']")) {
+      return;
+    }
+
+    dragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startScrollLeft: container.scrollLeft,
+      hasDragged: false,
+    };
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const container = scrollRef.current;
+    if (!container || event.pointerId !== dragState.current.pointerId) return;
+
+    const deltaX = event.clientX - dragState.current.startX;
+
+    if (!dragState.current.hasDragged && Math.abs(deltaX) > DRAG_THRESHOLD) {
+      dragState.current.hasDragged = true;
+      preventClickRef.current = true;
+      setIsDragging(true);
+      container.setPointerCapture(event.pointerId);
+    }
+
+    if (!dragState.current.hasDragged) return;
+
+    container.scrollLeft = dragState.current.startScrollLeft - deltaX;
+  };
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const container = scrollRef.current;
+    if (!container || event.pointerId !== dragState.current.pointerId) return;
+
+    if (container.hasPointerCapture(event.pointerId)) {
+      container.releasePointerCapture(event.pointerId);
+    }
+
+    setIsDragging(false);
+    dragState.current.pointerId = -1;
+    dragState.current.hasDragged = false;
+
+    window.setTimeout(() => {
+      preventClickRef.current = false;
+    }, 0);
+  };
+
+  const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!preventClickRef.current) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   if (featuredItems.length === 0) return null;
 
@@ -44,8 +113,17 @@ const FeaturedSection = () => {
       </motion.div>
 
       <div
-        className="flex gap-4 overflow-x-auto overscroll-x-contain pb-4 px-1 sm:px-2 snap-x snap-mandatory scrollbar-hide"
-        style={{ WebkitOverflowScrolling: "touch" }}
+        ref={scrollRef}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onClickCapture={handleClickCapture}
+        className={`flex gap-4 overflow-x-auto overscroll-x-contain pb-4 px-1 sm:px-2 snap-x snap-mandatory scrollbar-hide select-none ${
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        }`}
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
       >
         {featuredItems.map((item, i) => (
           <div
