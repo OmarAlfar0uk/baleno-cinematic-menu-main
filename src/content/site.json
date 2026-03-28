@@ -206,7 +206,7 @@
       "description": "NY Style",
       "descriptionAr": "",
       "price": 65,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702869/baleno-menu/mp4and4ndkr5ypikqwi6.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "desserts"
