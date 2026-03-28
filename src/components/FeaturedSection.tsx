@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { useStore } from "@/store/useStore";
 import { MenuItem } from "@/store/useStore";
 import ProductDetailsModal from "./ProductDetailsModal";
 import { formatCurrency } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { warmImageBatch } from "@/lib/imageWarmup";
 
 const FeaturedSection = () => {
-  const DRAG_THRESHOLD = 6;
   const { items, settings } = useStore();
   const featuredItems = useMemo(
     () => items.filter((i) => i.bestSeller && i.available !== false),
@@ -18,17 +16,6 @@ const FeaturedSection = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const isMobile = useIsMobile();
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const preventClickRef = useRef(false);
-  const enablePointerDrag = !isMobile;
-  const dragState = useRef({
-    pointerId: -1,
-    startX: 0,
-    startScrollLeft: 0,
-    hasDragged: false,
-  });
   const featuredImageUrls = useMemo(
     () => featuredItems.map((item) => item.image).filter((image): image is string => Boolean(image)),
     [featuredItems]
@@ -38,61 +25,6 @@ const FeaturedSection = () => {
     if (featuredImageUrls.length === 0) return;
     warmImageBatch(featuredImageUrls, 4);
   }, [featuredImageUrls]);
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const target = event.target as HTMLElement;
-    if (target.closest("button, a, input, textarea, select, [role='button']")) {
-      return;
-    }
-
-    dragState.current = {
-      pointerId: event.pointerId,
-      startX: event.clientX,
-      startScrollLeft: container.scrollLeft,
-      hasDragged: false,
-    };
-  };
-
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    const container = scrollRef.current;
-    if (!container || event.pointerId !== dragState.current.pointerId) return;
-
-    const deltaX = event.clientX - dragState.current.startX;
-
-    if (!dragState.current.hasDragged && Math.abs(deltaX) > DRAG_THRESHOLD) {
-      dragState.current.hasDragged = true;
-      preventClickRef.current = true;
-      setIsDragging(true);
-      container.setPointerCapture(event.pointerId);
-    }
-
-    if (!dragState.current.hasDragged) return;
-
-    container.scrollLeft = dragState.current.startScrollLeft - deltaX;
-  };
-
-  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    const container = scrollRef.current;
-    if (!container || event.pointerId !== dragState.current.pointerId) return;
-
-    if (container.hasPointerCapture(event.pointerId)) {
-      container.releasePointerCapture(event.pointerId);
-    }
-    setIsDragging(false);
-    dragState.current.pointerId = -1;
-    dragState.current.hasDragged = false;
-  };
-
-  const handleClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!preventClickRef.current) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    preventClickRef.current = false;
-  };
 
   if (featuredItems.length === 0) return null;
 
@@ -112,30 +44,17 @@ const FeaturedSection = () => {
       </motion.div>
 
       <div
-        ref={scrollRef}
-        onPointerDown={enablePointerDrag ? handlePointerDown : undefined}
-        onPointerMove={enablePointerDrag ? handlePointerMove : undefined}
-        onPointerUp={enablePointerDrag ? handlePointerUp : undefined}
-        onPointerLeave={enablePointerDrag ? handlePointerUp : undefined}
-        onPointerCancel={enablePointerDrag ? handlePointerUp : undefined}
-        onClickCapture={enablePointerDrag ? handleClickCapture : undefined}
-        className={`flex gap-5 overflow-x-auto overscroll-x-contain pb-4 px-2 snap-x snap-mandatory scrollbar-hide select-none ${
-          enablePointerDrag ? (isDragging ? "cursor-grabbing" : "cursor-grab") : ""
-        }`}
+        className="flex gap-4 overflow-x-auto overscroll-x-contain pb-4 px-1 sm:px-2 snap-x snap-mandatory scrollbar-hide"
         style={{ WebkitOverflowScrolling: "touch" }}
       >
-        {featuredItems.slice(0, 5).map((item, i) => (
-          <motion.div
+        {featuredItems.map((item, i) => (
+          <div
             key={item.id}
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 24 }}
-            whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: shouldReduceMotion ? 0.2 : 0.35, delay: shouldReduceMotion ? 0 : i * 0.06 }}
             onClick={() => {
               setSelectedItem(item);
               setDetailsOpen(true);
             }}
-            className="shrink-0 w-64 md:w-72 snap-center rounded-2xl bg-card p-6
+            className="shrink-0 w-[82vw] max-w-[18rem] md:w-72 snap-start rounded-2xl bg-card p-6
               border border-border/50 hover:border-tertiary/50
               transition-shadow duration-300 group card-3d cursor-pointer"
           >
@@ -150,7 +69,7 @@ const FeaturedSection = () => {
                       <img
                         src={item.image}
                         alt={item.name}
-                        loading="eager"
+                        loading={i < 4 ? "eager" : "lazy"}
                         decoding="async"
                         fetchPriority={i < 3 ? "high" : "auto"}
                         className="image-3d-pic max-h-40 w-auto object-contain p-3"
@@ -176,7 +95,7 @@ const FeaturedSection = () => {
                 + Add
               </button>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 
