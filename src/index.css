@@ -202,6 +202,36 @@
     border-bottom: 1px solid hsl(var(--border) / 0.5);
   }
 
+  .best-seller-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .best-seller-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 -40%;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, hsl(var(--secondary) / 0.12), transparent);
+    transform: skewX(-18deg);
+    animation: best-seller-sheen 4.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .best-seller-spark {
+    display: inline-flex;
+    font-size: 0;
+    line-height: 1;
+    animation: best-seller-spark 2.2s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  .best-seller-spark::before {
+    content: "\26A1";
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
   .shimmer {
     background: linear-gradient(
       110deg,
@@ -329,6 +359,17 @@
   50% { transform: translateY(8px); }
 }
 
+@keyframes best-seller-spark {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.9; }
+  50% { transform: translateY(-2px) scale(1.08); opacity: 1; }
+}
+
+@keyframes best-seller-sheen {
+  0%, 70%, 100% { transform: translateX(0) skewX(-18deg); opacity: 0; }
+  15% { opacity: 0.7; }
+  35% { transform: translateX(360%) skewX(-18deg); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html:focus-within {
     scroll-behavior: auto;
@@ -338,6 +379,8 @@
   .animate-pulse-glow,
   .animate-gradient-shift,
   .shimmer,
+  .best-seller-card::before,
+  .best-seller-spark,
   .steam::before,
   .card-3d,
   .card-3d:hover {

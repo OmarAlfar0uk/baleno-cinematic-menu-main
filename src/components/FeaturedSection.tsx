@@ -106,6 +106,13 @@ const FeaturedSection = () => {
         transition={{ duration: shouldReduceMotion ? 0.2 : 0.35 }}
         className="mb-8"
       >
+        <motion.div
+          className="mb-2 flex justify-center text-accent-orange"
+          animate={shouldReduceMotion ? undefined : { y: [0, -3, 0], scale: [1, 1.06, 1] }}
+          transition={shouldReduceMotion ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <span className="best-seller-spark text-2xl">âš¡</span>
+        </motion.div>
         <h2 className="font-heading text-3xl md:text-4xl text-gold gold-glow tracking-wider text-center">
           ⚡ Baleno Specials
         </h2>
@@ -126,13 +133,17 @@ const FeaturedSection = () => {
         style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" }}
       >
         {featuredItems.map((item, i) => (
-          <div
+          <motion.div
             key={item.id}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
+            whileInView={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={shouldReduceMotion ? { duration: 0.15 } : { duration: 0.28, delay: i * 0.04 }}
             onClick={() => {
               setSelectedItem(item);
               setDetailsOpen(true);
             }}
-            className="shrink-0 w-[82vw] max-w-[18rem] md:w-72 snap-start rounded-2xl bg-card p-6
+            className="best-seller-card shrink-0 w-[82vw] max-w-[18rem] md:w-72 snap-start rounded-2xl bg-card p-6
               border border-border/50 hover:border-tertiary/50
               transition-shadow duration-300 group card-3d cursor-pointer"
           >
@@ -173,7 +184,7 @@ const FeaturedSection = () => {
                 + Add
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useStore, MenuItem } from "@/store/useStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,6 +128,10 @@ const AdminMenuItems = () => {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSavingItem, setIsSavingItem] = useState(false);
   const pendingDeleteTimersRef = useRef<Map<string, number>>(new Map());
+  const listTopRef = useRef<HTMLDivElement>(null);
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const deferredAvailabilityFilter = useDeferredValue(availabilityFilter);
+  const deferredSortBy = useDeferredValue(sortBy);
 
   const buildCurrentDraft = () => {
     const snapshot = useStore.getState();
@@ -304,10 +308,10 @@ const AdminMenuItems = () => {
   );
 
   const filteredItems = useMemo(() => {
-    const queryFiltered = filterMenuItems(items, categories, searchQuery);
-    const availabilityFiltered = filterByAvailability(queryFiltered, availabilityFilter);
-    return sortMenuItems(availabilityFiltered, sortBy, sourceOrderMap);
-  }, [items, categories, searchQuery, availabilityFilter, sortBy, sourceOrderMap]);
+    const queryFiltered = filterMenuItems(items, categories, deferredSearchQuery);
+    const availabilityFiltered = filterByAvailability(queryFiltered, deferredAvailabilityFilter);
+    return sortMenuItems(availabilityFiltered, deferredSortBy, sourceOrderMap);
+  }, [items, categories, deferredSearchQuery, deferredAvailabilityFilter, deferredSortBy, sourceOrderMap]);
 
   const stats = useMemo(() => getMenuItemStats(filteredItems), [filteredItems]);
 
@@ -336,8 +340,43 @@ const AdminMenuItems = () => {
     }
   }, [currentPage, safePage]);
 
+  useEffect(() => {
+    listTopRef.current?.scrollIntoView({ block: "start", behavior: "auto" });
+  }, [safePage]);
+
+  const handleSearchChange = (value: string) => {
+    startTransition(() => {
+      setSearchQuery(value);
+    });
+  };
+
+  const handleAvailabilityFilterChange = (value: AvailabilityFilter) => {
+    startTransition(() => {
+      setAvailabilityFilter(value);
+    });
+  };
+
+  const handleSortChange = (value: ItemSort) => {
+    startTransition(() => {
+      setSortBy(value);
+    });
+  };
+
+  const goToPreviousPage = () => {
+    startTransition(() => {
+      setCurrentPage((page) => Math.max(1, page - 1));
+    });
+  };
+
+  const goToNextPage = () => {
+    startTransition(() => {
+      setCurrentPage((page) => Math.min(totalPages, page + 1));
+    });
+  };
+
   return (
     <div>
+      <div ref={listTopRef} />
       <div className="space-y-3 mb-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h2 className="font-heading text-xl text-foreground">Menu Items</h2>
@@ -348,7 +387,7 @@ const AdminMenuItems = () => {
 
         <Input
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           placeholder="Search by English name, Arabic name, or category"
           className="bg-muted border-border"
           aria-label="Search menu items"
@@ -364,7 +403,7 @@ const AdminMenuItems = () => {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setAvailabilityFilter(option.value as AvailabilityFilter)}
+                onClick={() => handleAvailabilityFilterChange(option.value as AvailabilityFilter)}
                 aria-pressed={availabilityFilter === option.value}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs border transition-colors ${
                   availabilityFilter === option.value
@@ -387,7 +426,7 @@ const AdminMenuItems = () => {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setSortBy(option.value as ItemSort)}
+                onClick={() => handleSortChange(option.value as ItemSort)}
                 aria-pressed={sortBy === option.value}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs border transition-colors ${
                   sortBy === option.value
@@ -404,7 +443,7 @@ const AdminMenuItems = () => {
         <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 gap-3">
           <select
             value={availabilityFilter}
-            onChange={(e) => setAvailabilityFilter(e.target.value as AvailabilityFilter)}
+            onChange={(e) => handleAvailabilityFilterChange(e.target.value as AvailabilityFilter)}
             className="w-full h-10 rounded-md border border-border bg-muted px-3 text-sm text-foreground"
             aria-label="Filter by availability"
           >
@@ -415,7 +454,7 @@ const AdminMenuItems = () => {
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as ItemSort)}
+            onChange={(e) => handleSortChange(e.target.value as ItemSort)}
             className="w-full h-10 rounded-md border border-border bg-muted px-3 text-sm text-foreground"
             aria-label="Sort menu items"
           >
@@ -562,7 +601,7 @@ const AdminMenuItems = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              onClick={goToPreviousPage}
               disabled={currentPage === 1}
               className="h-8 px-3"
             >
@@ -574,7 +613,7 @@ const AdminMenuItems = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              onClick={goToNextPage}
               disabled={currentPage === totalPages}
               className="h-8 px-3"
             >
