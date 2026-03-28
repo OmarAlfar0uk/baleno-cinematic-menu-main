@@ -266,7 +266,7 @@
       "description": "Hearty Start",
       "descriptionAr": "",
       "price": 120,
-      "image": "",
+      "image": "/menu-images/full-english-breakfast-full-english.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "breakfast"
