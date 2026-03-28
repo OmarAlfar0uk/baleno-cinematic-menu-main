@@ -98,7 +98,7 @@
       "description": "Velvety",
       "descriptionAr": "",
       "price": 50,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702993/baleno-menu/copeq910gycsz9onrxqn.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "hot-drinks"
@@ -110,7 +110,7 @@
       "description": "Chilled Perfection",
       "descriptionAr": "",
       "price": 55,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702839/baleno-menu/klsdriddzabvqnbedyhz.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "cold-drinks"
@@ -122,7 +122,7 @@
       "description": "Blended Magic",
       "descriptionAr": "",
       "price": 60,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702770/baleno-menu/hlji6hijrftxvyuiqmji.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "cold-drinks"
@@ -134,7 +134,7 @@
       "description": "Japanese Vibes",
       "descriptionAr": "",
       "price": 65,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702862/baleno-menu/yamzkvureb4bvkmahtih.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "cold-drinks"
@@ -146,7 +146,7 @@
       "description": "Slow Steeped",
       "descriptionAr": "",
       "price": 60,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702854/baleno-menu/x9bbeqp24oifnvzm373i.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "cold-drinks"
@@ -158,7 +158,7 @@
       "description": "",
       "descriptionAr": "",
       "price": 40,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702816/baleno-menu/z8wzxy9nqpbcbxk88dym.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "fresh-juices"
@@ -170,7 +170,7 @@
       "description": "",
       "descriptionAr": "",
       "price": 35,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702808/baleno-menu/vqjjnhyf3bbwfzusb7u7.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "fresh-juices"
@@ -182,7 +182,7 @@
       "description": "",
       "descriptionAr": "",
       "price": 50,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702826/baleno-menu/jm9qp5q82lqihr0dgxyt.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "fresh-juices"
@@ -194,7 +194,7 @@
       "description": "Italian Classic",
       "descriptionAr": "",
       "price": 70,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702877/baleno-menu/tfuhf8lcx7zpg8wawkv1.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "desserts"
@@ -206,7 +206,7 @@
       "description": "NY Style",
       "descriptionAr": "",
       "price": 65,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702869/baleno-menu/mp4and4ndkr5ypikqwi6.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "desserts"
@@ -218,7 +218,7 @@
       "description": "Warm & Gooey",
       "descriptionAr": "",
       "price": 55,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702971/baleno-menu/ahpg83mtdqz9bor5njxi.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "desserts"
@@ -230,7 +230,7 @@
       "description": "Triple Deck",
       "descriptionAr": "",
       "price": 85,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702911/baleno-menu/voxzqsnnz4kzgxs1zayv.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "sandwiches"
@@ -242,7 +242,7 @@
       "description": "Smoky Flavor",
       "descriptionAr": "",
       "price": 90,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702920/baleno-menu/u7zjzn0fj4s5unj0kiai.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "sandwiches"
@@ -254,7 +254,7 @@
       "description": "Crispy Bread",
       "descriptionAr": "",
       "price": 75,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702886/baleno-menu/tonjszudnvtveom3m6at.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "sandwiches"
@@ -266,7 +266,7 @@
       "description": "Hearty Start",
       "descriptionAr": "",
       "price": 120,
-      "image": "/menu-images/full-english-breakfast-full-english.jpg",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702931/baleno-menu/x734whymplqeu7ybwxvn.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "breakfast"
@@ -278,7 +278,7 @@
       "description": "Fluffy & Sweet",
       "descriptionAr": "",
       "price": 80,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702897/baleno-menu/q5vb70fauqdkzjf16q7q.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "breakfast"
