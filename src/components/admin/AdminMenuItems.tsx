@@ -28,6 +28,7 @@ import {
   paginateItems,
   sortMenuItems,
 } from "./adminMenuItems.utils";
+import { isCloudinaryConfigured, uploadImageToCloudinary } from "@/lib/cloudinaryUpload";
 
 const emptyForm = {
   name: "",
@@ -123,9 +124,10 @@ const AdminMenuItems = () => {
   const [sortBy, setSortBy] = useState<ItemSort>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [imagePreviewBroken, setImagePreviewBroken] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const pendingDeleteTimersRef = useRef<Map<string, number>>(new Map());
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -139,15 +141,27 @@ const AdminMenuItems = () => {
       return;
     }
 
-    compressImage(file)
-      .then((result) => {
-        setImagePreviewBroken(false);
-        setForm((prev) => ({ ...prev, image: result }));
-        toast.success("Image uploaded and optimized");
-      })
-      .catch(() => {
-        toast.error("Could not process this image");
-      });
+    setIsUploadingImage(true);
+
+    try {
+      const result = await compressImage(file);
+      setImagePreviewBroken(false);
+
+      if (isCloudinaryConfigured()) {
+        const imageUrl = await uploadImageToCloudinary(result);
+        setForm((prev) => ({ ...prev, image: imageUrl }));
+        toast.success("Image uploaded to Cloudinary");
+        return;
+      }
+
+      setForm((prev) => ({ ...prev, image: result }));
+      toast.success("Image prepared for publish");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not process this image");
+    } finally {
+      setIsUploadingImage(false);
+      e.target.value = "";
+    }
   };
 
   const openAdd = () => {
@@ -575,9 +589,17 @@ const AdminMenuItems = () => {
                 <label className="flex-1">
                   <div className="border-2 border-dashed border-border rounded-lg p-4 cursor-pointer hover:border-secondary/50 transition-colors text-center">
                     <Upload size={16} className="mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-xs text-muted-foreground">Click to upload image</p>
+                    <p className="text-xs text-muted-foreground">
+                      {isUploadingImage ? "Uploading..." : "Click to upload image"}
+                    </p>
                   </div>
-                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    disabled={isUploadingImage}
+                  />
                 </label>
                 {form.image && (
                   <button
@@ -586,6 +608,7 @@ const AdminMenuItems = () => {
                       setForm({ ...form, image: "" });
                     }}
                     className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                    disabled={isUploadingImage}
                   >
                     <X size={16} />
                   </button>
@@ -617,7 +640,13 @@ const AdminMenuItems = () => {
               </label>
             </div>
             <div className="flex gap-3 pt-2">
-              <Button onClick={handleSave} className="flex-1 bg-[#22c55e] hover:bg-[#16a34a] text-white">Save</Button>
+              <Button
+                onClick={handleSave}
+                disabled={isUploadingImage}
+                className="flex-1 bg-[#22c55e] hover:bg-[#16a34a] text-white"
+              >
+                {isUploadingImage ? "Uploading..." : "Save"}
+              </Button>
               <Button onClick={() => setModalOpen(false)} variant="outline" className="flex-1">Cancel</Button>
             </div>
           </div>

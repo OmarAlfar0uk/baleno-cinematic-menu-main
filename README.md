@@ -19,6 +19,9 @@ Create these environment variables in Vercel before using the admin publish flow
 - `GITHUB_REPO_OWNER`: GitHub owner or organization name
 - `GITHUB_REPO_NAME`: repository name
 - `GITHUB_REPO_BRANCH`: branch to publish to, usually `main`
+- `VITE_CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name for direct image uploads
+- `VITE_CLOUDINARY_UPLOAD_PRESET`: unsigned upload preset used by the admin image picker
+- `VITE_CLOUDINARY_FOLDER`: optional Cloudinary folder for menu images
 
 After deployment:
 
@@ -27,4 +30,4 @@ After deployment:
 3. Edit the menu in the dashboard
 4. Press `Publish Live`
 
-Publishing updates `src/content/site.json` and uploaded images inside `public/menu-images`, then Vercel redeploys from the new GitHub commit.
+When Cloudinary is configured, product images upload immediately to Cloudinary and `Publish Live` saves only the latest menu data to GitHub. Without Cloudinary, the project falls back to the original Git-based image publish flow.
