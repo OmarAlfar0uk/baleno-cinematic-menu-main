@@ -62,7 +62,7 @@
       "description": "Rich & Bold",
       "descriptionAr": "",
       "price": 30,
-      "image": "",
+      "image": "/menu-images/espresso-hot-drinks-espresso.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "hot-drinks"
@@ -86,7 +86,7 @@
       "description": "Traditional",
       "descriptionAr": "",
       "price": 35,
-      "image": "",
+      "image": "/menu-images/turkish-coffee-hot-drinks-turkish-coffee.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "hot-drinks"
@@ -266,7 +266,7 @@
       "description": "Hearty Start",
       "descriptionAr": "",
       "price": 120,
-      "image": "",
+      "image": "/menu-images/full-english-breakfast-full-english.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "breakfast"
