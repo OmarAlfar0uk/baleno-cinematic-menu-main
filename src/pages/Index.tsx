@@ -5,8 +5,10 @@ import MenuSection from "@/components/MenuSection";
 import FloatingCart from "@/components/FloatingCart";
 import CartDrawer from "@/components/CartDrawer";
 import OpeningCurtain from "@/components/OpeningCurtain";
-import { useStore } from "@/store/useStore";
+import { useStore, type Branch, type MenuCategory, type MenuItem, type Settings } from "@/store/useStore";
 import { AnimatePresence, motion } from "framer-motion";
+import { fetchPublishedSiteDraft } from "@/lib/netlifyPublishing";
+import { normalizePublishedContent } from "@/lib/publishedContent";
 
 const INTRO_SEEN_KEY = "baleno-intro-seen";
 const AdminDashboard = lazy(() => import("@/components/admin/AdminDashboard"));
@@ -51,6 +53,50 @@ const Index = ({ openAdminOnLoad = false }: IndexProps) => {
     if (!stillExists) setActiveCategory(categories[0].id);
   }, [categories, activeCategory]);
 
+  useEffect(() => {
+    let disposed = false;
+
+    const syncLiveContent = async () => {
+      try {
+        const liveDraft = normalizePublishedContent(await fetchPublishedSiteDraft());
+        if (disposed) return;
+
+        const snapshot = useStore.getState();
+        const branches = liveDraft.branches as Branch[];
+        const currentBranchId = branches.some((branch) => branch.id === snapshot.currentBranchId)
+          ? snapshot.currentBranchId
+          : liveDraft.currentBranchId;
+
+        useStore.setState({
+          branches,
+          currentBranchId,
+          categories: liveDraft.categories as MenuCategory[],
+          items: liveDraft.items as MenuItem[],
+          settings: liveDraft.settings as Settings,
+        });
+      } catch {
+        // Keep bundled content as fallback when live content is unavailable.
+      }
+    };
+
+    void syncLiveContent();
+
+    if (adminOpen) {
+      return () => {
+        disposed = true;
+      };
+    }
+
+    const intervalId = window.setInterval(() => {
+      void syncLiveContent();
+    }, 15000);
+
+    return () => {
+      disposed = true;
+      window.clearInterval(intervalId);
+    };
+  }, [adminOpen]);
+
   const handleCategoryChange = (id: string) => {
     setActiveCategory(id);
 
@@ -60,7 +106,6 @@ const Index = ({ openAdminOnLoad = false }: IndexProps) => {
     target.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  // Build category data once per categories/items update to avoid repeated filtering work.
   const menuCategories = useMemo(
     () =>
       categories.map((cat) => ({

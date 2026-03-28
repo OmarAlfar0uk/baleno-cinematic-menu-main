@@ -29,6 +29,7 @@ import {
   sortMenuItems,
 } from "./adminMenuItems.utils";
 import { isCloudinaryConfigured, uploadImageToCloudinary } from "@/lib/cloudinaryUpload";
+import { saveSiteDraft } from "@/lib/netlifyPublishing";
 
 const emptyForm = {
   name: "",
@@ -125,7 +126,42 @@ const AdminMenuItems = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [imagePreviewBroken, setImagePreviewBroken] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isSavingItem, setIsSavingItem] = useState(false);
   const pendingDeleteTimersRef = useRef<Map<string, number>>(new Map());
+
+  const buildCurrentDraft = () => {
+    const snapshot = useStore.getState();
+    return {
+      settings: snapshot.settings,
+      branches: snapshot.branches,
+      currentBranchId: snapshot.currentBranchId,
+      categories: snapshot.categories,
+      items: snapshot.items,
+    };
+  };
+
+  const syncDraftToLiveMenu = async (successMessage?: string) => {
+    setIsSavingItem(true);
+
+    try {
+      const savedDraft = await saveSiteDraft(buildCurrentDraft());
+      savedDraft.items.forEach((item) => {
+        if (!item.image) return;
+        updateItem(item.id, { image: item.image });
+      });
+
+      if (successMessage) {
+        toast.success(successMessage);
+      }
+
+      return true;
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Item was saved locally, but live sync failed.");
+      return false;
+    } finally {
+      setIsSavingItem(false);
+    }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -188,7 +224,7 @@ const AdminMenuItems = () => {
     setModalOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const name = form.name.trim() || form.nameAr.trim();
     const nameAr = form.nameAr.trim() || form.name.trim();
     const categoryId = form.categoryId || categories[0]?.id;
@@ -215,12 +251,13 @@ const AdminMenuItems = () => {
 
     if (editingId) {
       updateItem(editingId, payload);
-      toast.success("Item updated");
     } else {
       addItem(payload);
-      toast.success("Item added");
     }
+
     setModalOpen(false);
+
+    await syncDraftToLiveMenu(editingId ? "Item saved live" : "Item added live");
   };
 
   const handleDeleteWithUndo = (itemId: string) => {
@@ -228,6 +265,7 @@ const AdminMenuItems = () => {
     if (!itemToDelete) return;
 
     deleteItem(itemId);
+    void syncDraftToLiveMenu("Item deleted live");
 
     const timerId = window.setTimeout(() => {
       pendingDeleteTimersRef.current.delete(itemId);
@@ -247,10 +285,15 @@ const AdminMenuItems = () => {
             pendingDeleteTimersRef.current.delete(itemId);
           }
           restoreItem(itemToDelete);
-          toast.success("Item restored");
+          void syncDraftToLiveMenu("Item restored live");
         },
       },
     });
+  };
+
+  const handleAvailabilityChange = (itemId: string, available: boolean) => {
+    updateItem(itemId, { available });
+    void syncDraftToLiveMenu("Availability updated live");
   };
 
   const getCategoryLabel = (id: string) => categories.find((c) => c.id === id)?.label || "—";
@@ -419,7 +462,7 @@ const AdminMenuItems = () => {
                 <span className="text-sm text-muted-foreground">Available</span>
                 <Switch
                   checked={item.available !== false}
-                  onCheckedChange={(v) => updateItem(item.id, { available: v })}
+                  onCheckedChange={(v) => handleAvailabilityChange(item.id, v)}
                 />
               </div>
               <div className="flex items-center gap-3">
@@ -476,7 +519,7 @@ const AdminMenuItems = () => {
                   <td className="p-3">
                     <Switch
                       checked={item.available !== false}
-                      onCheckedChange={(v) => updateItem(item.id, { available: v })}
+                      onCheckedChange={(v) => handleAvailabilityChange(item.id, v)}
                     />
                   </td>
                   <td className="p-3 text-right space-x-2">
@@ -598,7 +641,7 @@ const AdminMenuItems = () => {
                     accept="image/*"
                     onChange={handleImageUpload}
                     className="hidden"
-                    disabled={isUploadingImage}
+                    disabled={isUploadingImage || isSavingItem}
                   />
                 </label>
                 {form.image && (
@@ -608,7 +651,7 @@ const AdminMenuItems = () => {
                       setForm({ ...form, image: "" });
                     }}
                     className="px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
-                    disabled={isUploadingImage}
+                    disabled={isUploadingImage || isSavingItem}
                   >
                     <X size={16} />
                   </button>
@@ -642,12 +685,12 @@ const AdminMenuItems = () => {
             <div className="flex gap-3 pt-2">
               <Button
                 onClick={handleSave}
-                disabled={isUploadingImage}
+                disabled={isUploadingImage || isSavingItem}
                 className="flex-1 bg-[#22c55e] hover:bg-[#16a34a] text-white"
               >
-                {isUploadingImage ? "Uploading..." : "Save"}
+                {isUploadingImage ? "Uploading..." : isSavingItem ? "Saving..." : "Save"}
               </Button>
-              <Button onClick={() => setModalOpen(false)} variant="outline" className="flex-1">Cancel</Button>
+              <Button onClick={() => setModalOpen(false)} variant="outline" className="flex-1" disabled={isSavingItem}>Cancel</Button>
             </div>
           </div>
         </DialogContent>
@@ -679,3 +722,5 @@ const AdminMenuItems = () => {
 };
 
 export default AdminMenuItems;
+
+

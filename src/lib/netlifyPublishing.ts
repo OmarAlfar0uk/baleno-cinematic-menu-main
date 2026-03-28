@@ -90,6 +90,12 @@ export async function refreshPublishingSession(listener?: (session: PublishingSe
   }
 }
 
+export async function fetchPublishedSiteDraft() {
+  return requestJson<PublishedDraft>("/api/site-content", {
+    method: "GET",
+  });
+}
+
 export async function loginPublishingAdmin(password: string) {
   await requestJson("/api/admin/login", {
     method: "POST",
@@ -113,3 +119,5 @@ export async function publishSiteDraft(draft: PublishedDraft) {
     body: JSON.stringify(draft),
   });
 }
+
+export const saveSiteDraft = publishSiteDraft;
