@@ -206,7 +206,7 @@
       "description": "NY Style",
       "descriptionAr": "",
       "price": 65,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774701110/baleno-menu/utacg7e0lrrrz0dvrz7e.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "desserts"
@@ -230,7 +230,7 @@
       "description": "Triple Deck",
       "descriptionAr": "",
       "price": 85,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774701100/baleno-menu/aumrmehjg0ptgaewbk9i.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "sandwiches"
@@ -254,7 +254,7 @@
       "description": "Crispy Bread",
       "descriptionAr": "",
       "price": 75,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774701093/baleno-menu/dr4vvbmcpqmoevuwclia.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "sandwiches"
@@ -278,7 +278,7 @@
       "description": "Fluffy & Sweet",
       "descriptionAr": "",
       "price": 80,
-      "image": "",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774701085/baleno-menu/qbafgqeljqn5jsvttmhx.jpg",
       "bestSeller": false,
       "available": true,
       "categoryId": "breakfast"
