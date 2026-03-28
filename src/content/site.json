@@ -266,7 +266,7 @@
       "description": "Hearty Start",
       "descriptionAr": "",
       "price": 120,
-      "image": "/menu-images/full-english-breakfast-full-english.jpg",
+      "image": "https://res.cloudinary.com/dgbqprk3l/image/upload/v1774702931/baleno-menu/x734whymplqeu7ybwxvn.jpg",
       "bestSeller": true,
       "available": true,
       "categoryId": "breakfast"
