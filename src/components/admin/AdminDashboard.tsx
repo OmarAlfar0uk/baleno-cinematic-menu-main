@@ -11,10 +11,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
-  getPublishingUserEmail,
-  initPublishingIdentity,
+  type PublishingSession,
+  getPublishingSession,
+  refreshPublishingSession,
   logoutPublishingUser,
-  openPublishingLogin,
   publishSiteDraft,
 } from "@/lib/netlifyPublishing";
 
@@ -36,7 +36,7 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
   const [activeTab, setActiveTab] = useState<Tab>("items");
   const [clock, setClock] = useState(new Date());
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [publishingEmail, setPublishingEmail] = useState<string | null>(getPublishingUserEmail());
+  const [publishingSession, setPublishingSession] = useState<PublishingSession>(getPublishingSession());
   const [isPublishing, setIsPublishing] = useState(false);
   const { items, categories, orders, updateItem } = useStore();
 
@@ -46,35 +46,27 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
   }, []);
 
   useEffect(() => {
-    initPublishingIdentity(setPublishingEmail);
+    void refreshPublishingSession(setPublishingSession);
   }, []);
 
   const todayOrders = orders.filter(
     (o) => new Date(o.timestamp).toDateString() === new Date().toDateString()
   ).length;
 
-  const handleConnectPublishing = () => {
-    try {
-      openPublishingLogin();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Publishing login is unavailable.");
-    }
-  };
-
   const handleDisconnectPublishing = async () => {
     try {
       await logoutPublishingUser();
-      setPublishingEmail(null);
-      toast.success("Publishing account disconnected");
+      setPublishingSession((current) => ({ ...current, authenticated: false, label: null }));
+      toast.success("Admin session signed out");
+      onClose();
     } catch {
-      toast.error("Could not disconnect publishing account");
+      toast.error("Could not sign out of the admin session");
     }
   };
 
   const handlePublishLive = async () => {
-    if (!publishingEmail) {
-      handleConnectPublishing();
-      toast.error("Connect your publishing account first.");
+    if (!publishingSession.authenticated) {
+      toast.error("Your admin session expired. Open the dashboard again and log in.");
       return;
     }
 
@@ -94,9 +86,20 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
         updateItem(item.id, { image: item.image || "" });
       });
 
-      toast.success("Changes published. Netlify will deploy the update now.");
+      if (publishedDraft.repo || publishedDraft.branch) {
+        setPublishingSession((current) => ({
+          ...current,
+          repo: publishedDraft.repo || current.repo,
+          branch: publishedDraft.branch || current.branch,
+        }));
+      }
+
+      toast.success("Changes published. GitHub is updated and Vercel will redeploy.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Publishing failed.";
+      if (message.toLowerCase().includes("log in")) {
+        setPublishingSession((current) => ({ ...current, authenticated: false }));
+      }
       toast.error(message);
     } finally {
       setIsPublishing(false);
@@ -118,7 +121,6 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
         />
       )}
 
-      {/* Sidebar */}
       <div
         className={`w-56 shrink-0 flex flex-col bg-espresso-deep border-r border-border
           absolute lg:static left-0 top-0 bottom-0 z-20 transition-transform duration-300
@@ -166,9 +168,7 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
         </div>
       </div>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
         <header className="min-h-14 border-b border-border flex items-center justify-between px-4 lg:px-6 py-3 lg:py-0 shrink-0 gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
@@ -184,7 +184,7 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
             <Button
               type="button"
               onClick={handlePublishLive}
-              disabled={isPublishing}
+              disabled={isPublishing || !publishingSession.authenticated}
               className="hidden md:inline-flex bg-[#22c55e] hover:bg-[#16a34a] text-white"
             >
               <CloudUpload size={15} />
@@ -204,26 +204,33 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
           <div className="rounded-xl border border-border bg-card px-4 py-3 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-foreground">
-                {publishingEmail ? `Publishing connected: ${publishingEmail}` : "Publishing account not connected"}
+                {publishingSession.authenticated
+                  ? `Publishing ready: ${publishingSession.repo || "GitHub repository"}`
+                  : "Publishing locked. Log in again from the admin entry to publish."}
               </p>
               <p className="text-xs text-muted-foreground">
-                Keep using your classic dashboard. When you finish editing, press <span className="font-semibold text-foreground">Publish Live</span> to send the latest menu and images to everyone.
+                Keep using your classic dashboard. When you finish editing, press <span className="font-semibold text-foreground">Publish Live</span> to commit the latest menu and images, then let Vercel redeploy automatically.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              {publishingEmail ? (
+              {publishingSession.authenticated ? (
                 <Button type="button" variant="outline" onClick={handleDisconnectPublishing} className="gap-2">
-                  <Unplug size={14} /> Disconnect
+                  <Unplug size={14} /> Sign Out
                 </Button>
               ) : (
-                <Button type="button" variant="outline" onClick={handleConnectPublishing} className="gap-2">
-                  <Link2 size={14} /> Connect Publishing
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => window.location.assign("/admin")}
+                  className="gap-2"
+                >
+                  <Link2 size={14} /> Unlock Publishing
                 </Button>
               )}
               <Button
                 type="button"
                 onClick={handlePublishLive}
-                disabled={isPublishing}
+                disabled={isPublishing || !publishingSession.authenticated}
                 className="md:hidden bg-[#22c55e] hover:bg-[#16a34a] text-white gap-2"
               >
                 <CloudUpload size={15} />
@@ -233,7 +240,6 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:gap-4 p-4 lg:p-6 shrink-0">
           {[
             { label: "Total Items", value: items.length },
@@ -247,7 +253,6 @@ const AdminDashboard = ({ onClose }: AdminDashboardProps) => {
           ))}
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-y-auto scrollbar-hide px-4 lg:px-6 pb-6">
           {activeTab === "items" && <AdminMenuItems />}
           {activeTab === "categories" && <AdminCategories />}

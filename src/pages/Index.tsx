@@ -15,17 +15,15 @@ const AboutStrip = lazy(() => import("@/components/AboutStrip"));
 const Footer = lazy(() => import("@/components/Footer"));
 const AdminGate = lazy(() => import("@/components/AdminGate"));
 
-const Index = () => {
+interface IndexProps {
+  openAdminOnLoad?: boolean;
+}
+
+const Index = ({ openAdminOnLoad = false }: IndexProps) => {
   const { categories, items } = useStore();
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id || "");
   const [cartOpen, setCartOpen] = useState(false);
-  const [adminOpen, setAdminOpen] = useState(() => {
-    try {
-      return new URLSearchParams(window.location.search).get("publishing_connected") === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [adminOpen, setAdminOpen] = useState(false);
   const [introDone, setIntroDone] = useState(() => {
     try {
       return localStorage.getItem(INTRO_SEEN_KEY) === "1";
@@ -52,18 +50,6 @@ const Index = () => {
     const stillExists = categories.some((category) => category.id === activeCategory);
     if (!stillExists) setActiveCategory(categories[0].id);
   }, [categories, activeCategory]);
-
-  useEffect(() => {
-    try {
-      const url = new URL(window.location.href);
-      if (url.searchParams.get("publishing_connected") === "1") {
-        url.searchParams.delete("publishing_connected");
-        window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
-      }
-    } catch {
-      // Ignore query cleanup failures.
-    }
-  }, []);
 
   const handleCategoryChange = (id: string) => {
     setActiveCategory(id);
@@ -125,7 +111,7 @@ const Index = () => {
         <FloatingCart onClick={() => setCartOpen(true)} />
         <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
         <Suspense fallback={null}>
-          <AdminGate onAuthenticated={() => setAdminOpen(true)} />
+          <AdminGate initialOpen={openAdminOnLoad} onAuthenticated={() => setAdminOpen(true)} />
         </Suspense>
       </motion.div>
 
