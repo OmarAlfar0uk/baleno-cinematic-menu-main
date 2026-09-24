@@ -13,9 +13,8 @@
 
 <p align="center">
   <a href="#-key-features">Key Features</a> •
-  <a href="#-user-experience--design">Design Philosophy</a> •
+  <a href="#-system-architecture">System Architecture</a> •
   <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-admin-portal">Admin Portal</a> •
   <a href="#-getting-started">Getting Started</a> •
   <a href="#-author">Author</a>
 </p>
